@@ -1123,6 +1123,128 @@ Muting Device...
 
 ---
 
+# Adapter Pattern vs Bridge Pattern in C\#
+
+## Understanding the Difference
+
+| Aspect           | Adapter Pattern                                                        | Bridge Pattern                                                                                    |
+| ---------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Purpose**      | Makes two incompatible interfaces work together.                       | Separates an abstraction from its implementation.                                                 |
+| **When to Use**  | When you need to integrate an existing interface without modifying it. | When you want to vary both the abstraction and implementation independently.                      |
+| **Structure**    | Adapts a specific interface to match another interface.                | Divides the abstraction and implementation into separate hierarchies.                             |
+| **Flexibility**  | Limited to converting one interface to another.                        | High flexibility – you can change abstraction and implementation independently.                   |
+| **Relationship** | Typically works with existing classes (legacy or third-party).         | Typically used in new designs to provide flexibility.                                             |
+| **Example**      | Adapting a legacy logging system to a modern logging interface.        | Decoupling a drawing tool abstraction (Shape) from its rendering implementation (Raster, Vector). |
+
+---
+
+## Adapter Pattern in C\#
+
+### What is Adapter Pattern?
+
+* It is a **Structural Design Pattern** that allows incompatible interfaces to work together.
+* The Adapter acts as a middle layer between two classes.
+
+### Example:
+
+```csharp
+// Existing Class (Incompatible Interface)
+public class LegacyAudioPlayer
+{
+    public void PlayLegacyAudio() => Console.WriteLine("Playing audio using legacy player.");
+}
+
+// Target Interface
+public interface IAudioPlayer
+{
+    void PlayAudio();
+}
+
+// Adapter
+public class AudioPlayerAdapter : IAudioPlayer
+{
+    private readonly LegacyAudioPlayer _legacyPlayer;
+
+    public AudioPlayerAdapter(LegacyAudioPlayer legacyPlayer)
+    {
+        _legacyPlayer = legacyPlayer;
+    }
+
+    public void PlayAudio()
+    {
+        _legacyPlayer.PlayLegacyAudio();
+    }
+}
+
+// Usage
+var legacyPlayer = new LegacyAudioPlayer();
+IAudioPlayer player = new AudioPlayerAdapter(legacyPlayer);
+player.PlayAudio();  // Output: Playing audio using legacy player.
+```
+
+---
+
+## Bridge Pattern in C\#
+
+### What is Bridge Pattern?
+
+* It is a **Structural Design Pattern** that separates an abstraction from its implementation.
+* The abstraction and implementation can be developed independently.
+
+### Example:
+
+```csharp
+// Abstraction
+public abstract class Shape
+{
+    protected IDrawingTool drawingTool;
+
+    protected Shape(IDrawingTool drawingTool)
+    {
+        this.drawingTool = drawingTool;
+    }
+
+    public abstract void Draw();
+}
+
+// Refined Abstraction
+public class Circle : Shape
+{
+    public Circle(IDrawingTool drawingTool) : base(drawingTool) { }
+
+    public override void Draw()
+    {
+        drawingTool.DrawShape("Circle");
+    }
+}
+
+// Implementor
+public interface IDrawingTool
+{
+    void DrawShape(string shape);
+}
+
+// Concrete Implementor
+public class RasterDrawingTool : IDrawingTool
+{
+    public void DrawShape(string shape) => Console.WriteLine($"Drawing {shape} using Raster.");
+}
+
+// Usage
+Shape circle = new Circle(new RasterDrawingTool());
+circle.Draw();  // Output: Drawing Circle using Raster.
+```
+
+---
+
+## Key Takeaways
+
+* **Adapter Pattern:** Focuses on converting an existing interface to match another interface.
+* **Bridge Pattern:** Focuses on decoupling abstraction and implementation, allowing them to vary independently.
+* Adapter is best for legacy systems or third-party integrations, while Bridge is best for creating flexible, scalable architectures.
+
+
+
 
 ## 8. Composite Pattern
 
