@@ -5590,3 +5590,655 @@ OWASP (Open Web Application Security Project) is an organization that provides b
 
 * Restrict allowed HTTP methods using `MapControllers()` with specified methods (GET, POST).
 
+# C# Data Structures and Algorithms Deep Dive
+
+## Introduction
+
+This guide is a comprehensive, time-saving learning resource for mastering Data Structures and Algorithms in C#. It is designed to take you from basic to advanced levels, providing a deep understanding of each data structure, its usage, implementation, best practices, and common mistakes.
+
+## What You Will Learn:
+
+* Core Data Structures: Arrays, Lists, Stacks, Queues, Linked Lists, HashSets, Dictionaries.
+* Advanced Data Structures: Trees (Binary Tree, Binary Search Tree, AVL, Red-Black Tree), Heaps (Min-Heap, Max-Heap), Graphs.
+* Key Algorithms: Sorting (Bubble Sort, Quick Sort, Merge Sort), Searching (Linear, Binary), Recursion, Backtracking, Dynamic Programming, Greedy Algorithms.
+* Real-World Examples: Applying each data structure and algorithm in practical scenarios.
+* Performance Analysis: Understanding Time Complexity (Big-O Notation).
+* Comparison Mastery: When to use each data structure or algorithm and why.
+
+## Structure of This Guide:
+
+1. Basics of Data Structures
+2. Understanding Algorithms
+3. Arrays and Lists
+4. Stacks and Queues
+5. Linked Lists (Singly, Doubly, Circular)
+6. Hashing (Dictionaries and HashSets)
+7. Trees (Binary, BST, AVL, Red-Black)
+8. Heaps and Priority Queues
+9. Graphs (DFS, BFS, Dijkstra’s Algorithm)
+10. Sorting Algorithms
+11. Searching Algorithms
+12. Recursion and Backtracking
+13. Dynamic Programming
+14. Greedy Algorithms
+15. Performance Analysis (Big-O)
+16. Real-World Project Examples
+17. Mastering with Q\&A
+
+## 1. Basics of Data Structures
+
+### What are Data Structures?
+
+Data structures are ways of organizing and storing data in a computer so that it can be used efficiently. Different data structures are optimized for different operations such as fast access, insertion, deletion, and searching.
+
+### Why Data Structures Matter:
+
+* Efficient data storage and access.
+* Optimized performance for specific operations.
+* Enables solving complex problems efficiently.
+
+### Key Concepts to Understand:
+
+* **Linear vs Non-Linear Structures:** Arrays, Lists (Linear) vs Trees, Graphs (Non-Linear).
+* **Static vs Dynamic Structures:** Arrays (Fixed size) vs Lists, Trees (Flexible size).
+* **Homogeneous vs Heterogeneous:** Arrays (Same type) vs Classes (Mixed types).
+
+### Common Data Structure Operations:
+
+* Insert (Adding an element)
+* Delete (Removing an element)
+* Search (Finding an element)
+* Access (Retrieving an element)
+* Update (Modifying an element)
+
+### C# Code Example (Array Basics):
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // Array Example - Static Data Structure
+        int[] numbers = new int[] { 1, 2, 3, 4, 5 };
+
+        // Accessing Elements
+        Console.WriteLine("First Element: " + numbers[0]);
+
+        // Iterating through the Array
+        Console.WriteLine("All Elements:");
+        foreach (var num in numbers)
+        {
+            Console.WriteLine(num);
+        }
+
+        // Modifying an Element
+        numbers[2] = 10;
+        Console.WriteLine("Modified Element at Index 2: " + numbers[2]);
+    }
+}
+```
+
+### Output:
+
+```
+First Element: 1
+All Elements:
+1
+2
+3
+4
+5
+Modified Element at Index 2: 10
+```
+
+### Watchouts (Do's and Don'ts)
+
+* ✅ Use Arrays for fixed-size data collections.
+* ❌ Don’t use Arrays for dynamic data where size changes frequently.
+* ✅ Use Lists for dynamic data collections.
+
+---
+## 2. Understanding Algorithms
+
+### What are Algorithms?
+
+Algorithms are step-by-step procedures or instructions used to solve specific problems or perform tasks. They are the logic behind solving any computational problem.
+
+### Why Algorithms Matter:
+
+* Efficiently solve complex problems.
+* Optimize performance (speed and memory).
+* Provide a clear problem-solving approach.
+
+### Key Characteristics of a Good Algorithm:
+
+* **Input:** Takes zero or more inputs.
+* **Output:** Produces at least one output.
+* **Definiteness:** Each step is clearly defined.
+* **Finiteness:** Terminates after a finite number of steps.
+* **Effectiveness:** Steps must be simple and feasible.
+
+### Types of Algorithms:
+
+1. **Sorting Algorithms:** (Bubble Sort, Quick Sort, Merge Sort)
+2. **Searching Algorithms:** (Linear Search, Binary Search)
+3. **Recursion Algorithms:** (Factorial, Fibonacci)
+4. **Dynamic Programming:** (Knapsack, Longest Common Subsequence)
+5. **Greedy Algorithms:** (Coin Change, Minimum Spanning Tree)
+6. **Backtracking Algorithms:** (Sudoku Solver, N-Queens)
+7. **Graph Algorithms:** (DFS, BFS, Dijkstra)
+
+### Algorithm Analysis (Big-O Notation)
+
+* **Time Complexity:** Measures how the running time of an algorithm grows with the input size.
+
+  * O(1): Constant Time
+  * O(n): Linear Time
+  * O(n^2): Quadratic Time
+  * O(log n): Logarithmic Time
+  * O(n log n): Linear Logarithmic Time
+
+* **Space Complexity:** Measures the memory usage of an algorithm.
+
+### Example Algorithm: Linear Search (Simple Algorithm)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 5, 3, 8, 4, 2 };
+        int target = 4;
+
+        int index = LinearSearch(numbers, target);
+        Console.WriteLine(index >= 0 ? $"Element found at index {index}" : "Element not found");
+    }
+
+    static int LinearSearch(int[] array, int target)
+    {
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i] == target)
+                return i;
+        }
+        return -1; // Not found
+    }
+}
+```
+
+### Output:
+
+```
+Element found at index 3
+```
+
+### Why This is Important:
+
+* Linear Search is a basic algorithm for understanding the concept of searching.
+* It has a Time Complexity of O(n), meaning it scales linearly with the input size.
+* Understanding this helps you learn more efficient search algorithms like Binary Search (O(log n)).
+
+### Watchouts (Do's and Don'ts)
+
+* ✅ Understand the problem before choosing an algorithm.
+* ❌ Don’t choose a complex algorithm for a simple problem.
+* ✅ Optimize your algorithm for both time and space complexity.
+
+## 3. Arrays and Lists
+
+### Understanding Arrays
+
+* **Definition:** Arrays are a collection of elements of the same type, stored in contiguous memory locations.
+* **Characteristics:**
+
+  * Fixed size.
+  * Index-based (0-based index).
+  * Fast access (O(1)) but slow insertion and deletion (O(n)).
+
+### C# Code Example (Array)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // Array Example
+        int[] numbers = new int[] { 1, 2, 3, 4, 5 };
+
+        // Accessing Elements
+        Console.WriteLine("First Element: " + numbers[0]);
+
+        // Modifying Elements
+        numbers[2] = 10;
+
+        // Iterating through the Array
+        Console.WriteLine("Array Elements:");
+        foreach (var num in numbers)
+        {
+            Console.WriteLine(num);
+        }
+    }
+}
+```
+
+### When to Use Arrays:
+
+* ✅ Use Arrays for fixed-size data collections.
+* ❌ Avoid Arrays for dynamic data where size changes frequently.
+
+### Understanding Lists
+
+* **Definition:** Lists are dynamic data structures that can grow or shrink in size.
+* **Characteristics:**
+
+  * Dynamically resizable.
+  * Provides useful methods (Add, Remove, Contains).
+
+### C# Code Example (List)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // List Example
+        List<int> numberList = new List<int> { 1, 2, 3 };
+
+        // Adding Elements
+        numberList.Add(4);
+
+        // Removing Elements
+        numberList.Remove(2);
+
+        // Iterating through the List
+        Console.WriteLine("List Elements:");
+        foreach (var num in numberList)
+        {
+            Console.WriteLine(num);
+        }
+    }
+}
+```
+
+### Arrays vs Lists Comparison Table
+
+| Aspect      | Arrays                       | Lists                              |
+| ----------- | ---------------------------- | ---------------------------------- |
+| Size        | Fixed                        | Dynamic                            |
+| Performance | Faster (Contiguous Memory)   | Slightly Slower (Dynamic Resizing) |
+| Use Case    | Known, fixed-size data       | Dynamic, growing data              |
+| Memory      | Contiguous Memory Allocation | Dynamic (Heap-based)               |
+| Syntax      | `int[] numbers`              | `List<int> numbers`                |
+
+### When to Use Lists:
+
+* ✅ Use Lists for dynamic collections.
+* ❌ Avoid Lists for fixed-size data.
+
+### Watchouts (Do's and Don'ts)
+
+* ✅ Prefer Arrays when size is fixed.
+* ✅ Use Lists for flexible, resizable collections.
+* ❌ Don’t use Lists for performance-critical tasks where memory is a concern.
+
+## 4. Stacks and Queues
+
+### Understanding Stacks
+
+* **Definition:** A Stack is a linear data structure that follows the **LIFO (Last In, First Out)** principle.
+* **Common Operations:**
+
+  * `Push`: Add an element to the top.
+  * `Pop`: Remove the top element.
+  * `Peek`: View the top element without removing it.
+* **Use Cases:** Undo functionality, browser history, expression evaluation.
+
+### C# Code Example (Stack)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Stack Example
+        Stack<string> browserHistory = new Stack<string>();
+
+        // Adding Elements (Push)
+        browserHistory.Push("Homepage");
+        browserHistory.Push("Products");
+        browserHistory.Push("Cart");
+
+        // Viewing the Top Element (Peek)
+        Console.WriteLine("Current Page: " + browserHistory.Peek());
+
+        // Removing Elements (Pop)
+        browserHistory.Pop();
+
+        Console.WriteLine("After Back: " + browserHistory.Peek());
+    }
+}
+```
+
+### Output:
+
+```
+Current Page: Cart
+After Back: Products
+```
+
+### When to Use Stacks:
+
+* ✅ Use Stacks for LIFO operations (Undo, Redo, Call Stack).
+* ❌ Avoid Stacks for random access operations.
+
+---
+
+### Understanding Queues
+
+* **Definition:** A Queue is a linear data structure that follows the **FIFO (First In, First Out)** principle.
+* **Common Operations:**
+
+  * `Enqueue`: Add an element to the end.
+  * `Dequeue`: Remove the first element.
+  * `Peek`: View the first element without removing it.
+* **Use Cases:** Print queue, task scheduling, messaging systems.
+
+### C# Code Example (Queue)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Queue Example
+        Queue<string> taskQueue = new Queue<string>();
+
+        // Adding Elements (Enqueue)
+        taskQueue.Enqueue("Task 1");
+        taskQueue.Enqueue("Task 2");
+        taskQueue.Enqueue("Task 3");
+
+        // Viewing the First Element (Peek)
+        Console.WriteLine("Next Task: " + taskQueue.Peek());
+
+        // Removing Elements (Dequeue)
+        taskQueue.Dequeue();
+
+        Console.WriteLine("After Completing One Task: " + taskQueue.Peek());
+    }
+}
+```
+
+### Output:
+
+```
+Next Task: Task 1
+After Completing One Task: Task 2
+```
+
+### Stacks vs Queues Comparison Table
+
+| Aspect   | Stack (LIFO)       | Queue (FIFO)               |
+| -------- | ------------------ | -------------------------- |
+| Order    | Last In, First Out | First In, First Out        |
+| Use Case | Undo, Call Stack   | Task Scheduling, Messaging |
+| Methods  | Push, Pop, Peek    | Enqueue, Dequeue, Peek     |
+
+### When to Use Queues:
+
+* ✅ Use Queues for FIFO operations (Task Scheduling, Messaging).
+* ❌ Avoid Queues for random access operations.
+
+### Watchouts (Do's and Don'ts)
+
+* ✅ Prefer Stacks for LIFO tasks (Undo, Redo).
+* ✅ Use Queues for FIFO tasks (Order Processing, Messaging).
+* ❌ Don’t use Queues for fast access to elements.
+
+## 5. Linked Lists (Singly, Doubly, Circular)
+
+### Understanding Linked Lists
+
+* **Definition:** A Linked List is a linear data structure where each element (Node) is a separate object, and each node contains data and a reference (link) to the next node.
+* **Types of Linked Lists:**
+
+  * **Singly Linked List:** Nodes link only to the next node.
+  * **Doubly Linked List:** Nodes link to both the next and previous nodes.
+  * **Circular Linked List:** The last node points back to the first node.
+
+### When to Use Linked Lists:
+
+* ✅ Use Linked Lists for dynamic collections where insertions and deletions are frequent.
+* ❌ Avoid Linked Lists for fast access by index (slow due to traversal).
+
+---
+
+### 5.1 Singly Linked List
+
+### C# Code Example (Singly Linked List)
+
+```csharp
+using System;
+
+class Node
+{
+    public int Data;
+    public Node Next;
+
+    public Node(int data)
+    {
+        Data = data;
+        Next = null;
+    }
+}
+
+class SinglyLinkedList
+{
+    private Node head;
+
+    // Add Node to End
+    public void Add(int data)
+    {
+        Node newNode = new Node(data);
+
+        if (head == null)
+        {
+            head = newNode;
+        }
+        else
+        {
+            Node current = head;
+            while (current.Next != null)
+            {
+                current = current.Next;
+            }
+            current.Next = newNode;
+        }
+    }
+
+    // Display Linked List
+    public void Display()
+    {
+        Node current = head;
+        while (current != null)
+        {
+            Console.Write(current.Data + " -> ");
+            current = current.Next;
+        }
+        Console.WriteLine("null");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        SinglyLinkedList list = new SinglyLinkedList();
+        list.Add(10);
+        list.Add(20);
+        list.Add(30);
+        list.Display();
+    }
+}
+```
+
+### Output:
+
+```
+10 -> 20 -> 30 -> null
+```
+
+### When to Use Singly Linked Lists:
+
+* ✅ Use for simple, sequential data structures.
+* ❌ Avoid for reverse traversal (not possible).
+
+---
+
+### 5.2 Doubly Linked List
+
+### C# Code Example (Doubly Linked List)
+
+```csharp
+class DoublyNode
+{
+    public int Data;
+    public DoublyNode Next;
+    public DoublyNode Previous;
+
+    public DoublyNode(int data)
+    {
+        Data = data;
+        Next = null;
+        Previous = null;
+    }
+}
+
+class DoublyLinkedList
+{
+    private DoublyNode head;
+
+    // Add Node to End
+    public void Add(int data)
+    {
+        DoublyNode newNode = new DoublyNode(data);
+
+        if (head == null)
+        {
+            head = newNode;
+        }
+        else
+        {
+            DoublyNode current = head;
+            while (current.Next != null)
+            {
+                current = current.Next;
+            }
+            current.Next = newNode;
+            newNode.Previous = current;
+        }
+    }
+
+    // Display Linked List
+    public void Display()
+    {
+        DoublyNode current = head;
+        while (current != null)
+        {
+            Console.Write(current.Data + " <-> ");
+            current = current.Next;
+        }
+        Console.WriteLine("null");
+    }
+}
+```
+
+### Output:
+
+```
+10 <-> 20 <-> 30 <-> null
+```
+
+### When to Use Doubly Linked Lists:
+
+* ✅ Use for bidirectional traversal.
+* ❌ Avoid for high memory usage (additional pointer).
+
+---
+
+### 5.3 Circular Linked List
+
+### C# Code Example (Circular Linked List)
+
+```csharp
+class CircularLinkedList
+{
+    private Node head;
+
+    // Add Node
+    public void Add(int data)
+    {
+        Node newNode = new Node(data);
+
+        if (head == null)
+        {
+            head = newNode;
+            head.Next = head; // Circular Link
+        }
+        else
+        {
+            Node current = head;
+            while (current.Next != head)
+            {
+                current = current.Next;
+            }
+            current.Next = newNode;
+            newNode.Next = head;
+        }
+    }
+
+    // Display Linked List
+    public void Display()
+    {
+        if (head == null) return;
+
+        Node current = head;
+        do
+        {
+            Console.Write(current.Data + " -> ");
+            current = current.Next;
+        }
+        while (current != head);
+
+        Console.WriteLine("(Back to Head)");
+    }
+}
+```
+
+### Output:
+
+```
+10 -> 20 -> 30 -> (Back to Head)
+```
+
+### When to Use Circular Linked Lists:
+
+* ✅ Use for circular data structures (round-robin, task scheduling).
+* ❌ Avoid for complex data navigation.
+
+
