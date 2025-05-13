@@ -1,4 +1,4 @@
-# DeveloperShortNotes# Object-Oriented Programming (OOP) Principles: A Comprehensive Guide
+# Object-Oriented Programming (OOP) Principles: A Comprehensive Guide
 
 ## Introduction
 
