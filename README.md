@@ -7079,6 +7079,1234 @@ Sorted Array:
 * ✅ Use for small or nearly sorted datasets.
 * ❌ Avoid for large unsorted datasets.
 
+## 11. Searching Algorithms
+
+### Understanding Searching Algorithms
+
+* **Definition:** Searching is the process of finding an element in a collection (array, list, or any data structure).
+* **Types of Searching Algorithms:**
+
+  * **Linear Search:** Simple but inefficient (O(n)).
+  * **Binary Search:** Efficient for sorted data (O(log n)).
+  * **Exponential Search:** Efficient for large, sorted data (O(log n)).
+
+---
+
+### 11.1 Linear Search
+
+### C# Code Example (Linear Search)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 5, 3, 8, 4, 2 };
+        int target = 4;
+
+        int index = LinearSearch(numbers, target);
+        Console.WriteLine(index >= 0 ? $"Element found at index {index}" : "Element not found");
+    }
+
+    static int LinearSearch(int[] array, int target)
+    {
+        for (int i = 0; i < array.Length; i++)
+        {
+            if (array[i] == target)
+                return i;
+        }
+        return -1; // Not found
+    }
+}
+```
+
+### Output:
+
+```
+Element found at index 3
+```
+
+### When to Use Linear Search:
+
+* ✅ Use for small datasets.
+* ✅ Use for unsorted data.
+* ❌ Avoid for large, sorted data (use Binary Search).
+
+---
+
+### 11.2 Binary Search
+
+### C# Code Example (Binary Search)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 2, 3, 4, 5, 8 };
+        int target = 4;
+
+        int index = BinarySearch(numbers, target);
+        Console.WriteLine(index >= 0 ? $"Element found at index {index}" : "Element not found");
+    }
+
+    static int BinarySearch(int[] array, int target)
+    {
+        int left = 0, right = array.Length - 1;
+
+        while (left <= right)
+        {
+            int mid = (left + right) / 2;
+
+            if (array[mid] == target) return mid;
+            else if (array[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+
+        return -1; // Not found
+    }
+}
+```
+
+### Output:
+
+```
+Element found at index 2
+```
+
+### When to Use Binary Search:
+
+* ✅ Use for sorted data.
+* ✅ Use for fast searching (O(log n)).
+* ❌ Avoid for unsorted data (use Linear Search).
+
+---
+
+### 11.3 Exponential Search
+
+* Efficient for large, sorted arrays where the target is likely to be near the start.
+
+### C# Code Example (Exponential Search)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 1, 2, 3, 4, 5, 8, 10, 12, 15, 20 };
+        int target = 15;
+
+        int index = ExponentialSearch(numbers, target);
+        Console.WriteLine(index >= 0 ? $"Element found at index {index}" : "Element not found");
+    }
+
+    static int ExponentialSearch(int[] array, int target)
+    {
+        if (array[0] == target) return 0;
+
+        int i = 1;
+        while (i < array.Length && array[i] <= target)
+            i *= 2;
+
+        return BinarySearch(array, target, i / 2, Math.Min(i, array.Length - 1));
+    }
+
+    static int BinarySearch(int[] array, int target, int left, int right)
+    {
+        while (left <= right)
+        {
+            int mid = (left + right) / 2;
+            if (array[mid] == target) return mid;
+            else if (array[mid] < target) left = mid + 1;
+            else right = mid - 1;
+        }
+
+        return -1; // Not found
+    }
+}
+```
+
+### Output:
+
+```
+Element found at index 8
+```
+
+### When to Use Exponential Search:
+
+* ✅ Use for large, sorted datasets.
+* ✅ Use when the target is likely to be near the start.
+* ❌ Avoid for unsorted data (use Linear Search).
+
+### Searching Algorithms Comparison Table
+
+| Algorithm          | Time Complexity | Space Complexity | Use Case                        |
+| ------------------ | --------------- | ---------------- | ------------------------------- |
+| Linear Search      | O(n)            | O(1)             | Unsorted data, small datasets   |
+| Binary Search      | O(log n)        | O(1)             | Sorted data, fast search        |
+| Exponential Search | O(log n)        | O(1)             | Large, sorted data, fast search |
+
+## 12. Recursion and Backtracking
+
+### Understanding Recursion
+
+* **Definition:** Recursion is a technique where a function calls itself directly or indirectly to solve a problem.
+* **Key Characteristics:**
+
+  * A base case (termination condition).
+  * A recursive case (function calls itself).
+* **Use Cases:** Factorial calculation, Fibonacci sequence, Tree traversal, Backtracking.
+
+### 12.1 Simple Recursion - Factorial
+
+### C# Code Example (Recursive Factorial)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int number = 5;
+        int result = Factorial(number);
+        Console.WriteLine($"Factorial of {number} is {result}");
+    }
+
+    static int Factorial(int n)
+    {
+        if (n == 0) return 1; // Base Case
+        return n * Factorial(n - 1); // Recursive Case
+    }
+}
+```
+
+### Output:
+
+```
+Factorial of 5 is 120
+```
+
+### When to Use Recursion:
+
+* ✅ Use for problems that can be divided into similar subproblems.
+* ❌ Avoid for large problems (risk of stack overflow).
+
+---
+
+### 12.2 Backtracking - N-Queens Problem
+
+### What is Backtracking?
+
+* **Definition:** Backtracking is an algorithmic technique for solving problems by trying all possibilities and abandoning (backtracking) those that do not meet the solution criteria.
+* **Use Cases:** N-Queens, Sudoku Solver, Maze Solving, Permutations.
+
+### C# Code Example (N-Queens Problem)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int n = 4;
+        int[,] board = new int[n, n];
+
+        if (SolveNQueens(board, 0))
+            DisplayBoard(board);
+        else
+            Console.WriteLine("No solution found.");
+    }
+
+    static bool SolveNQueens(int[,] board, int row)
+    {
+        int n = board.GetLength(0);
+
+        if (row >= n) return true; // Solution found
+
+        for (int col = 0; col < n; col++)
+        {
+            if (IsSafe(board, row, col))
+            {
+                board[row, col] = 1;
+
+                if (SolveNQueens(board, row + 1))
+                    return true;
+
+                board[row, col] = 0; // Backtrack
+            }
+        }
+
+        return false;
+    }
+
+    static bool IsSafe(int[,] board, int row, int col)
+    {
+        for (int i = 0; i < row; i++)
+            if (board[i, col] == 1) return false;
+
+        for (int i = row, j = col; i >= 0 && j >= 0; i--, j--)
+            if (board[i, j] == 1) return false;
+
+        for (int i = row, j = col; i >= 0 && j < board.GetLength(0); i--, j++)
+            if (board[i, j] == 1) return false;
+
+        return true;
+    }
+
+    static void DisplayBoard(int[,] board)
+    {
+        int n = board.GetLength(0);
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+                Console.Write(board[i, j] + " ");
+            Console.WriteLine();
+        }
+    }
+}
+```
+
+### Output:
+
+```
+1 0 0 0 
+0 0 1 0 
+0 0 0 1 
+0 1 0 0 
+```
+
+### When to Use Backtracking:
+
+* ✅ Use for problems with multiple possibilities (Sudoku, N-Queens).
+* ❌ Avoid for large problem spaces without optimization.
+
+### Recursion vs Iteration
+
+| Aspect       | Recursion                         | Iteration                           |
+| ------------ | --------------------------------- | ----------------------------------- |
+| Memory Usage | Higher (Call Stack)               | Lower (Looping)                     |
+| Readability  | Clear for problems like Factorial | Less intuitive for complex problems |
+| Performance  | Risk of Stack Overflow            | Faster for large data               |
+
+## 13. Dynamic Programming
+
+### Understanding Dynamic Programming
+
+* **Definition:** Dynamic Programming (DP) is an optimization technique used to solve complex problems by breaking them down into smaller overlapping subproblems and storing the results of these subproblems to avoid redundant calculations.
+* **Key Characteristics:**
+
+  * Optimal Substructure: The problem can be divided into smaller, independent subproblems.
+  * Overlapping Subproblems: The same subproblem is solved multiple times.
+* **Two Approaches:**
+
+  * Top-Down (Memoization): Recursion + Caching results.
+  * Bottom-Up (Tabulation): Iterative + Table to store results.
+
+### 13.1 Fibonacci Sequence (Top-Down - Memoization)
+
+### C# Code Example (Fibonacci - Top-Down)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        int n = 10;
+        Console.WriteLine($"Fibonacci of {n} is {Fibonacci(n)}");
+    }
+
+    static Dictionary<int, long> memo = new Dictionary<int, long>();
+
+    static long Fibonacci(int n)
+    {
+        if (n <= 1) return n;
+
+        if (memo.ContainsKey(n)) return memo[n];
+
+        memo[n] = Fibonacci(n - 1) + Fibonacci(n - 2);
+        return memo[n];
+    }
+}
+```
+
+### Output:
+
+```
+Fibonacci of 10 is 55
+```
+
+### When to Use Memoization:
+
+* ✅ Use for recursive problems with overlapping subproblems.
+* ❌ Avoid for problems without overlapping subproblems.
+
+---
+
+### 13.2 Fibonacci Sequence (Bottom-Up - Tabulation)
+
+### C# Code Example (Fibonacci - Bottom-Up)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int n = 10;
+        Console.WriteLine($"Fibonacci of {n} is {Fibonacci(n)}");
+    }
+
+    static long Fibonacci(int n)
+    {
+        if (n <= 1) return n;
+
+        long[] dp = new long[n + 1];
+        dp[0] = 0;
+        dp[1] = 1;
+
+        for (int i = 2; i <= n; i++)
+        {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+
+        return dp[n];
+    }
+}
+```
+
+### Output:
+
+```
+Fibonacci of 10 is 55
+```
+
+### When to Use Tabulation:
+
+* ✅ Use for iterative problems with overlapping subproblems.
+* ❌ Avoid for problems where recursion is clearer.
+
+---
+
+### 13.3 Knapsack Problem (0/1 Knapsack)
+
+### Problem Explanation
+
+* Given a set of items with weights and values, determine the maximum value that can be obtained with a limited capacity.
+
+### C# Code Example (0/1 Knapsack - Bottom-Up)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] weights = { 1, 3, 4, 5 };
+        int[] values = { 15, 50, 60, 90 };
+        int capacity = 8;
+
+        Console.WriteLine($"Maximum Value: {Knapsack(weights, values, capacity)}");
+    }
+
+    static int Knapsack(int[] weights, int[] values, int capacity)
+    {
+        int n = weights.Length;
+        int[,] dp = new int[n + 1, capacity + 1];
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int w = 0; w <= capacity; w++)
+            {
+                if (weights[i - 1] <= w)
+                    dp[i, w] = Math.Max(dp[i - 1, w], dp[i - 1, w - weights[i - 1]] + values[i - 1]);
+                else
+                    dp[i, w] = dp[i - 1, w];
+            }
+        }
+
+        return dp[n, capacity];
+    }
+}
+```
+
+### Output:
+
+```
+Maximum Value: 150
+```
+
+### When to Use Dynamic Programming:
+
+* ✅ Use for problems with overlapping subproblems and optimal substructure.
+* ❌ Avoid for problems without these characteristics.
+
+### Identifying DP Problems
+
+* Look for problems with "maximum," "minimum," "count ways," or "combinations.".
+
+## 14. Greedy Algorithms
+
+### Understanding Greedy Algorithms
+
+* **Definition:** Greedy Algorithms are optimization techniques that build a solution by making a series of choices, each of which is the best local decision at that point.
+* **Key Characteristics:**
+
+  * Local Optimal Choice: Each decision is made to achieve the best immediate result.
+  * No Backtracking: Once a choice is made, it cannot be changed.
+* **Common Use Cases:** Coin Change Problem, Activity Selection, Fractional Knapsack.
+
+### 14.1 Coin Change Problem (Greedy)
+
+### Problem Explanation
+
+* Given an unlimited supply of coins of certain denominations, determine the minimum number of coins required to make a given amount.
+
+### C# Code Example (Coin Change - Greedy)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        int amount = 93;
+        int[] coins = { 50, 20, 10, 5, 2, 1 };
+
+        List<int> result = CoinChange(coins, amount);
+        Console.WriteLine("Coins Used: " + string.Join(", ", result));
+    }
+
+    static List<int> CoinChange(int[] coins, int amount)
+    {
+        Array.Sort(coins, (a, b) => b - a); // Sort coins in descending order
+        List<int> result = new List<int>();
+
+        foreach (int coin in coins)
+        {
+            while (amount >= coin)
+            {
+                amount -= coin;
+                result.Add(coin);
+            }
+        }
+
+        return result;
+    }
+}
+```
+
+### Output:
+
+```
+Coins Used: 50, 20, 20, 2, 1
+```
+
+### When to Use Greedy Approach:
+
+* ✅ Use for problems with a clear local optimal choice.
+* ❌ Avoid for problems where local optimal choices do not lead to a global optimal solution.
+
+---
+
+### 14.2 Activity Selection Problem
+
+### Problem Explanation
+
+* Given a list of activities with start and end times, select the maximum number of non-overlapping activities.
+
+### C# Code Example (Activity Selection)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        (int, int)[] activities = { (1, 4), (3, 5), (0, 6), (5, 7), (8, 9), (5, 9) };
+        var selected = ActivitySelection(activities);
+
+        Console.WriteLine("Selected Activities:");
+        foreach (var activity in selected)
+            Console.WriteLine($"Start: {activity.Item1}, End: {activity.Item2}");
+    }
+
+    static List<(int, int)> ActivitySelection((int, int)[] activities)
+    {
+        Array.Sort(activities, (a, b) => a.Item2.CompareTo(b.Item2)); // Sort by finish time
+
+        List<(int, int)> result = new List<(int, int)>();
+        int lastEnd = 0;
+
+        foreach (var activity in activities)
+        {
+            if (activity.Item1 >= lastEnd)
+            {
+                result.Add(activity);
+                lastEnd = activity.Item2;
+            }
+        }
+
+        return result;
+    }
+}
+```
+
+### Output:
+
+```
+Selected Activities:
+Start: 1, End: 4
+Start: 5, End: 7
+Start: 8, End: 9
+```
+
+### When to Use Greedy Algorithms:
+
+* ✅ Use for problems where a local optimal choice leads to a global solution.
+* ❌ Avoid for problems where local choices do not ensure the best global outcome.
+
+### Greedy Algorithms vs Dynamic Programming
+
+| Aspect            | Greedy Algorithm                       | Dynamic Programming                           |
+| ----------------- | -------------------------------------- | --------------------------------------------- |
+| Approach          | Local Optimal Choice (No Backtracking) | Global Optimal Solution (Caching)             |
+| Problem Type      | Optimization, Shortest Path            | Overlapping Subproblems, Optimal Substructure |
+| Complexity        | Faster (Usually O(n log n) or O(n))    | Slower (Often O(n^2), O(n \* W))              |
+| Use Case Examples | Coin Change, Activity Selection        | Knapsack, Fibonacci Sequence                  |
+
+
+## 15. Performance Analysis (Big-O Notation)
+
+### Understanding Big-O Notation
+
+* **Definition:** Big-O Notation is a mathematical notation used to describe the performance of an algorithm in terms of its time and space complexity as the input size grows.
+* **Why It Matters:** Big-O helps you understand how an algorithm will scale with larger inputs.
+
+### Key Big-O Notations
+
+| Notation   | Description       | Example Use Cases                 |
+| ---------- | ----------------- | --------------------------------- |
+| O(1)       | Constant Time     | Accessing an array element        |
+| O(log n)   | Logarithmic Time  | Binary Search                     |
+| O(n)       | Linear Time       | Linear Search, Iterating an array |
+| O(n log n) | Linearithmic Time | Merge Sort, Quick Sort            |
+| O(n^2)     | Quadratic Time    | Bubble Sort, Selection Sort       |
+| O(2^n)     | Exponential Time  | Fibonacci (Recursive)             |
+| O(n!)      | Factorial Time    | Permutations, N-Queens            |
+
+### Understanding Time Complexity
+
+* **Best Case:** The fastest an algorithm can run for a specific input.
+* **Average Case:** The expected performance for random inputs.
+* **Worst Case:** The slowest an algorithm can run for any input.
+
+### Analyzing Time Complexity with Examples
+
+#### Example 1: Accessing an Array Element (O(1))
+
+```csharp
+int[] numbers = { 1, 2, 3, 4, 5 };
+Console.WriteLine(numbers[2]); // O(1) - Direct Access
+```
+
+#### Example 2: Linear Search (O(n))
+
+```csharp
+int[] numbers = { 1, 2, 3, 4, 5 };
+int target = 4;
+
+foreach (var num in numbers)
+{
+    if (num == target)
+        Console.WriteLine("Found");
+}
+```
+
+#### Example 3: Binary Search (O(log n))
+
+```csharp
+Array.Sort(numbers); // Sorted Array
+int index = Array.BinarySearch(numbers, target); // O(log n)
+```
+
+#### Example 4: Nested Loops (O(n^2))
+
+```csharp
+for (int i = 0; i < numbers.Length; i++)
+{
+    for (int j = 0; j < numbers.Length; j++)
+    {
+        Console.WriteLine(numbers[i] + numbers[j]);
+    }
+}
+```
+
+### Understanding Space Complexity
+
+* **Definition:** Space complexity measures the memory an algorithm requires to run as the input size grows.
+* **Example:** An algorithm with O(1) space complexity uses a fixed amount of memory.
+
+### Analyzing Space Complexity with Examples
+
+#### Example 1: Constant Space (O(1))
+
+```csharp
+int sum = 0; // Single variable - O(1)
+```
+
+#### Example 2: Linear Space (O(n))
+
+```csharp
+int[] numbers = new int[n]; // Array of size n - O(n)
+```
+
+#### Example 3: Recursive Space (O(n))
+
+```csharp
+static int Factorial(int n)
+{
+    if (n == 0) return 1;
+    return n * Factorial(n - 1); // O(n) Stack Space
+}
+```
+
+### Best Practices for Performance Optimization
+
+* ✅ Prefer algorithms with lower time complexity (O(log n) or O(n)).
+* ✅ Minimize nested loops (O(n^2) or worse).
+* ✅ Use data structures that offer fast access (Dictionaries, HashSets).
+* ✅ Avoid excessive recursion without memoization.
+
+### Big-O Cheat Sheet
+
+| Algorithm Type        | Best Case  | Average Case | Worst Case | Space Complexity |
+| --------------------- | ---------- | ------------ | ---------- | ---------------- |
+| Linear Search         | O(1)       | O(n)         | O(n)       | O(1)             |
+| Binary Search         | O(1)       | O(log n)     | O(log n)   | O(1)             |
+| Bubble Sort           | O(n)       | O(n^2)       | O(n^2)     | O(1)             |
+| Selection Sort        | O(n^2)     | O(n^2)       | O(n^2)     | O(1)             |
+| Insertion Sort        | O(n)       | O(n^2)       | O(n^2)     | O(1)             |
+| Merge Sort            | O(n log n) | O(n log n)   | O(n log n) | O(n)             |
+| Quick Sort            | O(n log n) | O(n log n)   | O(n^2)     | O(log n)         |
+| Heap Sort             | O(n log n) | O(n log n)   | O(n log n) | O(1)             |
+| Fibonacci (Recursion) | O(2^n)     | O(2^n)       | O(2^n)     | O(n) (Stack)     |
+
+## 16. Real-World Project Examples
+
+### Why Real-World Projects Matter
+
+* They help you understand how data structures and algorithms are applied in practical scenarios.
+* They enhance your problem-solving skills by working on real-world challenges.
+
+---
+
+### Project 1: E-Commerce Order Management System
+
+#### Problem Description
+
+* Design an E-Commerce Order Management System with the following features:
+
+  * Users can add products to their cart (HashSet for unique items).
+  * Products are displayed in sorted order (Quick Sort).
+  * Users can search for products (Binary Search).
+  * Real-time order updates (Queue for order processing).
+
+#### Key Algorithms and Data Structures Used:
+
+* **HashSet:** To store unique products in the cart.
+* **Quick Sort:** To sort products by price.
+* **Binary Search:** For fast product lookup.
+* **Queue:** For processing user orders.
+
+#### C# Code Example (Order Management)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class OrderManagement
+{
+    private HashSet<string> cart = new HashSet<string>();
+    private Queue<string> orderQueue = new Queue<string>();
+
+    // Add Product to Cart
+    public void AddToCart(string product)
+    {
+        cart.Add(product);
+    }
+
+    // Display Sorted Products
+    public void DisplaySortedProducts()
+    {
+        List<string> sortedProducts = new List<string>(cart);
+        sortedProducts.Sort(); // Quick Sort
+
+        Console.WriteLine("Products in Cart:");
+        foreach (var product in sortedProducts)
+            Console.WriteLine(product);
+    }
+
+    // Search Product
+    public bool SearchProduct(string product)
+    {
+        List<string> sortedProducts = new List<string>(cart);
+        sortedProducts.Sort();
+        return sortedProducts.BinarySearch(product) >= 0;
+    }
+
+    // Process Order
+    public void ProcessOrder()
+    {
+        while (orderQueue.Count > 0)
+        {
+            Console.WriteLine("Processing Order for: " + orderQueue.Dequeue());
+        }
+    }
+
+    // Place Order
+    public void PlaceOrder()
+    {
+        foreach (var product in cart)
+        {
+            orderQueue.Enqueue(product);
+        }
+        Console.WriteLine("Order Placed.");
+        ProcessOrder();
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        OrderManagement orderSystem = new OrderManagement();
+        orderSystem.AddToCart("Laptop");
+        orderSystem.AddToCart("Phone");
+        orderSystem.AddToCart("Tablet");
+
+        orderSystem.DisplaySortedProducts();
+
+        Console.WriteLine("Search for Phone: " + (orderSystem.SearchProduct("Phone") ? "Found" : "Not Found"));
+
+        orderSystem.PlaceOrder();
+    }
+}
+```
+
+### Output:
+
+```
+Products in Cart:
+Laptop
+Phone
+Tablet
+Search for Phone: Found
+Order Placed.
+Processing Order for: Laptop
+Processing Order for: Phone
+Processing Order for: Tablet
+```
+
+### Why This Project is Important:
+
+* Demonstrates the use of HashSet, Quick Sort, Binary Search, and Queue.
+* Mimics a real-world order management system with efficient algorithms.
+
+---
+
+## 17. Mastering Q\&A (Advanced Interview Questions and Answers)
+
+### Why Mastering Q\&A Matters
+
+* It helps you solidify your understanding of data structures and algorithms.
+* It prepares you for technical interviews, coding challenges, and problem-solving tasks.
+
+---
+
+### Arrays and Lists - Q\&A
+
+1. **Q: What is the difference between an Array and a List in C#?**
+
+   * **A:** An Array is a fixed-size, contiguous memory collection of elements, while a List is a dynamically resizable collection. Arrays offer faster access (O(1)) but are not flexible. Lists are flexible but slightly slower due to dynamic resizing.
+
+2. **Q: When would you use an Array over a List?**
+
+   * **A:** Use an Array when the size of the collection is known and fixed. Use a List when the collection size is dynamic.
+
+3. **Q: What is the time complexity of inserting an element at the end of a List?**
+
+   * **A:** O(1) on average. However, if the List resizes, it may take O(n) due to reallocation.
+
+---
+
+### Linked Lists - Q\&A
+
+4. **Q: What is the difference between a Singly Linked List and a Doubly Linked List?**
+
+   * **A:** A Singly Linked List has nodes that point only to the next node, while a Doubly Linked List has nodes that point to both the next and previous nodes.
+
+5. **Q: When would you use a Circular Linked List?**
+
+   * **A:** Use a Circular Linked List for applications like round-robin scheduling, where the last node must point back to the first node.
+
+6. **Q: What is the time complexity of inserting a node at the start of a Singly Linked List?**
+
+   * **A:** O(1) - Direct insertion at the head.
+
+---
+
+### Stacks and Queues - Q\&A
+
+7. **Q: What is the difference between a Stack and a Queue?**
+
+   * **A:** A Stack is a LIFO (Last In, First Out) structure, while a Queue is a FIFO (First In, First Out) structure.
+
+8. **Q: How would you implement a Queue using two Stacks?**
+
+   * **A:** Use one stack for enqueue operations and another for dequeue operations, moving elements between stacks when needed.
+
+9. **Q: What is the time complexity of Push and Pop in a Stack?**
+
+   * **A:** O(1) for both operations.
+
+---
+
+### Trees and Graphs - Q\&A
+
+10. **Q: What is the difference between a Binary Tree and a Binary Search Tree (BST)?**
+
+* **A:** A Binary Tree is a general tree structure where each node has at most two children. A BST is a Binary Tree with a sorting rule: left child < parent < right child.
+
+11. **Q: When would you use a Trie (Prefix Tree)?**
+
+* **A:** Use a Trie for fast prefix search (autocomplete), such as in search engines.
+
+12. **Q: What is the time complexity of a Breadth-First Search (BFS) on a graph?**
+
+* **A:** O(V + E), where V is the number of vertices and E is the number of edges.
+
+---
+
+### Sorting and Searching - Q\&A
+
+13. **Q: What is the difference between Merge Sort and Quick Sort?**
+
+* **A:** Merge Sort is a stable, divide-and-conquer algorithm with O(n log n) complexity, while Quick Sort is faster in practice but may have O(n^2) complexity in the worst case.
+
+14. **Q: When would you use Binary Search?**
+
+* **A:** Use Binary Search on sorted arrays for fast lookups (O(log n)).
+
+15. **Q: Can you perform Binary Search on an unsorted array? Why or why not?**
+
+* **A:** No, because Binary Search relies on the sorted order of elements to eliminate half of the search space.
+
+---
+
+### Dynamic Programming and Greedy Algorithms - Q\&A
+
+16. **Q: What is the difference between Dynamic Programming and Greedy Algorithms?**
+
+* **A:** Dynamic Programming solves problems using overlapping subproblems and optimal substructure, while Greedy Algorithms make the best local choice at each step without backtracking.
+
+17. **Q: When would you prefer a Greedy approach over DP?**
+
+* **A:** Use Greedy when each local optimal choice leads to a global optimal solution (Activity Selection).
+
+18. **Q: What is Memoization in Dynamic Programming?**
+
+* **A:** Memoization is a Top-Down approach where subproblem results are cached to avoid redundant calculations.
+
+---
+
+### Advanced Q\&A (Complex Concepts)
+
+19. **Q: What is the difference between Recursion and Iteration?**
+
+* **A:** Recursion is a function calling itself, using the call stack (O(n) space), while Iteration is a loop-based approach with O(1) space.
+
+20. **Q: Explain the concept of Space Complexity with an example.**
+
+* **A:** Space Complexity is the amount of memory an algorithm uses. For example, a Fibonacci sequence using recursion has O(n) space complexity due to the call stack.
+
+21. **Q: What is a Hash Collision? How can it be resolved?**
+
+* **A:** A Hash Collision occurs when two keys produce the same hash value. It can be resolved using techniques like Chaining (Linked Lists) or Open Addressing (Linear Probing).
+
+22. **Q: What is a Heapify operation in a Heap?**
+
+* **A:** Heapify is the process of maintaining the heap property in a binary heap, either by "up-heaping" (insertion) or "down-heaping" (deletion).
+
+23. **Q: How does a Priority Queue differ from a regular Queue?**
+
+* **A:** A Priority Queue orders elements based on priority rather than insertion order, typically using a Min-Heap or Max-Heap.
+
+24. **Q: What is the difference between Breadth-First Search (BFS) and Depth-First Search (DFS)?**
+
+* **A:** BFS explores a graph level by level using a Queue (FIFO), while DFS explores depth first using a Stack (LIFO) or Recursion.
+
+25. **Q: What is the Time Complexity of Dijkstra's Algorithm?**
+
+* **A:** O((V + E) log V), where V is the number of vertices and E is the number of edges (using a Min-Heap).
+
+26. **Q: What is a Circular Queue? How is it different from a Linear Queue?**
+
+* **A:** A Circular Queue is a queue that connects the end to the front, improving space utilization. It avoids the "Queue Full" issue.
+
+27. **Q: What is a Perfect Binary Tree?**
+
+* **A:** A Perfect Binary Tree is a tree where all levels are completely filled.
+
+28. **Q: What is a Balanced Binary Tree?**
+
+* **A:** A Balanced Binary Tree is a tree where the height difference between left and right subtrees is at most one (AVL Tree).
+
+29. **Q: Explain Pre-Order, In-Order, and Post-Order Tree Traversal.**
+
+* **A:**
+
+  * Pre-Order: Root -> Left -> Right
+  * In-Order: Left -> Root -> Right
+  * Post-Order: Left -> Right -> Root
+
+30. **Q: How does Merge Sort maintain stability?**
+
+* **A:** Merge Sort maintains stability by preserving the relative order of equal elements during the merge phase.
+
+---
+
+### Advanced Q\&A - Sorting and Searching
+
+31. **Q: What is the difference between Insertion Sort and Selection Sort?**
+
+* **A:** Insertion Sort is faster for nearly sorted arrays (O(n)), while Selection Sort always has O(n^2) complexity.
+
+32. **Q: What is Ternary Search? How does it work?**
+
+* **A:** Ternary Search is a search algorithm that divides the array into three parts instead of two (Binary Search).
+
+33. **Q: What is the Time Complexity of Heap Sort?**
+
+* **A:** O(n log n) for building the heap and sorting.
+
+34. **Q: What is Counting Sort? When is it used?**
+
+* **A:** Counting Sort is a non-comparative sorting algorithm used for sorting integers in a limited range (O(n)).
+
+35. **Q: What is Radix Sort? How does it work?**
+
+* **A:** Radix Sort is a non-comparative sorting algorithm that processes numbers digit by digit.
+
+36. **Q: What is the difference between Stable and Unstable Sorting Algorithms?**
+
+* **A:** Stable Sorting Algorithms maintain the relative order of equal elements, while Unstable Algorithms do not.
+
+37. **Q: What is the best sorting algorithm for nearly sorted data?**
+
+* **A:** Insertion Sort (O(n)) is best for nearly sorted data.
+
+38. **Q: What is a Self-Balancing Tree? Provide examples.**
+
+* **A:** A Self-Balancing Tree automatically maintains balance. Examples: AVL Tree, Red-Black Tree.
+
+39. **Q: What is a Topological Sort? Where is it used?**
+
+* **A:** Topological Sort is a linear ordering of vertices in a directed acyclic graph (DAG). Used for task scheduling.
+
+40. **Q: How does Floyd-Warshall Algorithm work for finding shortest paths?**
+
+* **A:** It calculates the shortest paths between all pairs of vertices using dynamic programming (O(V^3)).
+
+41. **Q: What is the difference between Recursion and Iteration?**
+
+* **A:** Recursion is a method where a function calls itself, while Iteration uses loops. Recursion is easier to understand but may cause stack overflow for large inputs.
+
+42. **Q: What is a HashSet? When is it used?**
+
+* **A:** A HashSet is a collection of unique elements. It is used for fast lookups and ensuring uniqueness.
+
+43. **Q: What is the difference between BFS and DFS in a Tree vs Graph?**
+
+* **A:** In a Tree, BFS and DFS always reach all nodes, but in a Graph, they may not reach all nodes unless the graph is connected.
+
+44. **Q: Explain the concept of Memoization in Dynamic Programming.**
+
+* **A:** Memoization is a technique of caching the results of expensive function calls to avoid redundant calculations (Top-Down DP).
+
+45. **Q: What is an Adjacency Matrix vs Adjacency List?**
+
+* **A:** An Adjacency Matrix is a 2D array for graph representation (O(V^2) space). An Adjacency List is a list of neighbors for each vertex (O(V + E) space).
+
+46. **Q: What is a Circular Linked List? Provide a use case.**
+
+* **A:** A Circular Linked List is a list where the last node points to the first. It is used for round-robin scheduling.
+
+47. **Q: What is Top-Down and Bottom-Up Dynamic Programming?**
+
+* **A:** Top-Down uses recursion + memoization. Bottom-Up builds solutions iteratively using a table.
+
+48. **Q: What is the difference between a Stack and a Heap in memory?**
+
+* **A:** Stack is used for static memory allocation (function calls, local variables). Heap is used for dynamic memory allocation (objects).
+
+49. **Q: What is a Trie (Prefix Tree)? Where is it used?**
+
+* **A:** A Trie is a tree-like data structure for fast prefix lookups, used in autocomplete systems.
+
+50. **Q: Explain the difference between Quick Sort and Merge Sort.**
+
+* **A:** Quick Sort is faster in practice (O(n log n) average), but not stable. Merge Sort is slower but stable.
+
+---
+
+### Advanced Q\&A - Graphs and Trees
+
+51. **Q: What is a Minimum Spanning Tree (MST)?**
+
+* **A:** A MST is a subset of a graph's edges that connects all vertices with the minimum total edge weight.
+
+52. **Q: What is Prim’s Algorithm?**
+
+* **A:** Prim’s Algorithm is a Greedy approach to find the MST of a graph, starting from a single vertex.
+
+53. **Q: What is Kruskal’s Algorithm?**
+
+* **A:** Kruskal’s Algorithm is a Greedy approach for MST, sorting all edges and adding them if they do not form a cycle.
+
+54. **Q: What is a Self-Balancing Binary Search Tree?**
+
+* **A:** A tree that automatically maintains a balanced height (e.g., AVL Tree, Red-Black Tree).
+
+55. **Q: What is the purpose of a Priority Queue?**
+
+* **A:** A Priority Queue ensures that elements are processed based on priority (Min-Heap or Max-Heap).
+
+56. **Q: What is a Graph Cycle? How do you detect it?**
+
+* **A:** A Graph Cycle is a path that starts and ends at the same node. It can be detected using DFS with a visited set.
+
+57. **Q: What is the Time Complexity of Topological Sort?**
+
+* **A:** O(V + E), where V is the number of vertices and E is the number of edges.
+
+58. **Q: What is a Disjoint Set (Union-Find) and where is it used?**
+
+* **A:** A data structure that tracks a set of elements partitioned into disjoint sets. Used in Kruskal’s Algorithm for cycle detection.
+
+59. **Q: What is a Heap Sort? How does it work?**
+
+* **A:** Heap Sort is a sorting algorithm that uses a Heap to sort elements (O(n log n)).
+
+60. **Q: What is the difference between a Binary Heap and a Binary Search Tree (BST)?**
+
+* **A:** A Binary Heap is a complete binary tree (Min-Heap or Max-Heap). A BST is an ordered tree (left < root < right).
+
+### Advanced Q\&A - Continued
+
+61. **Q: What is a Hash Collision? How is it resolved in Hash Tables?**
+
+* **A:** A Hash Collision occurs when two keys produce the same hash value. It can be resolved using Chaining (Linked Lists) or Open Addressing (Linear Probing, Quadratic Probing).
+
+62. **Q: What is a Double-Ended Queue (Deque)?**
+
+* **A:** A Deque is a linear data structure that allows insertion and deletion from both ends (front and rear).
+
+63. **Q: What is a Sparse Matrix? How is it stored efficiently?**
+
+* **A:** A Sparse Matrix is a matrix with mostly zero values. It is stored efficiently using a List of Tuples (Row, Column, Value).
+
+64. **Q: What is an AVL Tree? What is the balance factor?**
+
+* **A:** An AVL Tree is a self-balancing BST where the height difference between left and right subtrees is at most 1. The balance factor is the difference in height of the left and right subtree.
+
+65. **Q: What is an Adjacency List in Graphs? Why is it preferred over an Adjacency Matrix?**
+
+* **A:** An Adjacency List is a list of neighbors for each vertex, providing O(V + E) space. It is preferred because it is memory-efficient for sparse graphs.
+
+66. **Q: What is a Cycle in a Graph? How do you detect a cycle in an undirected graph?**
+
+* **A:** A Cycle is a path that starts and ends at the same vertex. It can be detected using DFS with a visited set.
+
+67. **Q: What is a Segment Tree? Where is it used?**
+
+* **A:** A Segment Tree is a tree used for efficient range queries and updates. It is used in range sum, range minimum, and range maximum queries.
+
+68. **Q: What is the difference between HashSet and SortedSet?**
+
+* **A:** HashSet is unordered and offers O(1) operations, while SortedSet is ordered (ascending) and offers O(log n) operations.
+
+69. **Q: What is a B-Tree? Where is it used?**
+
+* **A:** A B-Tree is a self-balancing search tree used in databases and file systems for fast data retrieval.
+
+70. **Q: How does Breadth-First Search (BFS) ensure the shortest path in an unweighted graph?**
+
+* **A:** BFS explores all nodes at the current depth level before moving to the next level, ensuring the shortest path.
+
+---
+
+### Advanced Q\&A - Algorithms and Optimization
+
+71. **Q: What is the difference between Divide-and-Conquer and Dynamic Programming?**
+
+* **A:** Divide-and-Conquer splits a problem into independent subproblems (Merge Sort), while DP splits it into overlapping subproblems (Fibonacci).
+
+72. **Q: What is the difference between a Greedy Algorithm and a Dynamic Programming Algorithm?**
+
+* **A:** Greedy makes the best local choice (Activity Selection), while DP ensures the best global solution (Knapsack).
+
+73. **Q: What is the purpose of a Sliding Window Technique?**
+
+* **A:** It is used for efficient range-based calculations in an array, such as finding the maximum sum of a subarray.
+
+74. **Q: What is the difference between Binary Search Tree (BST) and Balanced BST?**
+
+* **A:** A BST has no height balancing, while a Balanced BST (AVL, Red-Black) maintains a balanced height for fast search.
+
+75. **Q: What is a LRU Cache? How is it implemented?**
+
+* **A:** A Least Recently Used (LRU) Cache is a caching strategy that removes the least recently used item. It is implemented using a LinkedHashMap.
+
+76. **Q: What is the Time Complexity of Quick Sort in the worst case? How is it optimized?**
+
+* **A:** O(n^2) in the worst case (when pivot is the smallest or largest). It is optimized using Randomized Pivot.
+
+77. **Q: What is a Priority Queue? How is it implemented in C#?**
+
+* **A:** A Priority Queue is a collection where each element has a priority. In C#, it is implemented using `PriorityQueue<T, TPriority>`.
+
+78. **Q: What is KMP Algorithm? When is it used?**
+
+* **A:** Knuth-Morris-Pratt (KMP) is a string matching algorithm that avoids redundant comparisons, used in substring search (O(n + m)).
+
+79. **Q: What is a Bellman-Ford Algorithm? How does it differ from Dijkstra?**
+
+* **A:** Bellman-Ford finds shortest paths even with negative weights (O(V \* E)), unlike Dijkstra which fails with negative weights.
+
+80. **Q: What is Floyd-Warshall Algorithm? Where is it used?**
+
+* **A:** It is an algorithm for finding shortest paths between all pairs of vertices in a graph (O(V^3)).
+
+
+
+
 
 
 
