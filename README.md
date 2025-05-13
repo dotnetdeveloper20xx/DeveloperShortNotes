@@ -691,11 +691,94 @@ Console.WriteLine("Cloned: " + clonedDocument);
 Original: Title: Design Patterns, Content: This is a guide on design patterns.
 Cloned: Title: Cloned Document, Content: This is a guide on design patterns.
 ```
-
 ## Benefits
 
 * Reduces the cost of creating complex objects from scratch.
 * Provides flexibility in creating copies without modifying the original object.
+
+## What is `MemberwiseClone`?
+
+* `MemberwiseClone` is a method defined in the base `Object` class of C#.
+* It creates a **shallow copy** of the current object.
+* A **shallow copy** means that all value-type fields are copied, but reference-type fields still point to the same objects in memory.
+
+## Syntax:
+
+```csharp
+return (IPrototype)MemberwiseClone();
+```
+
+### Breaking Down the Code:
+
+* **`MemberwiseClone`**: This method is called to create a shallow copy of the current object.
+* **`(IPrototype)`**: This is a type cast. It converts the cloned object to the `IPrototype` interface type.
+* **`return`**: The cloned object is returned to the caller.
+
+## When to Use `MemberwiseClone`:
+
+* Use it when you need to create a copy of an object but do not want to copy the referenced objects it contains.
+* Commonly used in the **Prototype Design Pattern**, where objects are cloned rather than created from scratch.
+
+## Example:
+
+### Defining a Prototype Class:
+
+```csharp
+public interface IPrototype
+{
+    IPrototype Clone();
+}
+
+public class Person : IPrototype
+{
+    public string Name { get; set; }
+    public Address Address { get; set; }
+
+    public IPrototype Clone()
+    {
+        return (IPrototype)MemberwiseClone();
+    }
+}
+
+public class Address
+{
+    public string City { get; set; }
+}
+```
+
+### Usage:
+
+```csharp
+Person original = new Person
+{
+    Name = "John",
+    Address = new Address { City = "London" }
+};
+
+Person cloned = (Person)original.Clone();
+cloned.Name = "Jane";
+cloned.Address.City = "Paris";
+
+Console.WriteLine(original.Name);     // Output: John
+Console.WriteLine(original.Address.City); // Output: Paris (Shallow copy problem)
+```
+
+## Why Use Shallow Copy (MemberwiseClone)?
+
+* It is fast and efficient for objects that primarily use value-type properties.
+* It is useful for creating a quick copy without duplicating complex objects.
+
+## Watchouts:
+
+* Shallow copy can lead to unexpected changes if the object contains reference-type fields (like the `Address` in the example).
+* For deep copying, you must manually clone reference-type fields.
+
+## Best Practices:
+
+* Use `MemberwiseClone` for simple, value-type objects.
+* Use Deep Copy techniques for objects containing complex reference types.
+
+
 
 ## Similar Patterns to Learn
 
