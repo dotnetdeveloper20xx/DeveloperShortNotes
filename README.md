@@ -2867,3 +2867,143 @@ var subscriber = new ReactiveSubscriber();
 publisher.OnEvent += subscriber.OnEventReceived;
 publisher.Publish("Order Placed");
 ```
+# Mastering Dependency Injection (DI) in ASP.NET Core
+
+## Introduction
+
+Dependency Injection (DI) is a design pattern that enables loose coupling between components in an application. In ASP.NET Core, DI is a first-class citizen and is natively supported by the framework.
+
+### What is Dependency Injection?
+
+Dependency Injection is a technique where an object’s dependencies are provided externally, rather than the object creating them itself.
+
+* **Why Use DI?**: It improves code maintainability, testability, and scalability.
+* **How DI Works in ASP.NET Core?**: ASP.NET Core uses a built-in DI container that supports three main lifetimes: Transient, Scoped, and Singleton.
+
+## Core Concepts
+
+### 1. Types of Dependency Injection
+
+* **Constructor Injection (Most Common)**: Dependencies are provided via the constructor.
+
+  ```csharp
+  public class NotificationService
+  {
+      private readonly IMessageService _messageService;
+
+      public NotificationService(IMessageService messageService)
+      {
+          _messageService = messageService;
+      }
+
+      public void Notify(string message)
+      {
+          Console.WriteLine(_messageService.SendMessage(message));
+      }
+  }
+  ```
+
+* **Property Injection (Setter Injection)**: Dependencies are set via properties.
+
+  ```csharp
+  public class NotificationService
+  {
+      public IMessageService MessageService { get; set; }
+
+      public void Notify(string message)
+      {
+          Console.WriteLine(MessageService?.SendMessage(message));
+      }
+  }
+  ```
+
+* **Method Injection**: Dependencies are passed as method parameters.
+
+  ```csharp
+  public class NotificationService
+  {
+      public void Notify(IMessageService messageService, string message)
+      {
+          Console.WriteLine(messageService.SendMessage(message));
+      }
+  }
+  ```
+
+### 2. DI Lifetime Scopes (In-Depth)
+
+* **Transient**: A new instance is created each time the service is requested.
+
+  ```csharp
+  builder.Services.AddTransient<ITransientService, TransientService>();
+  ```
+
+* **Scoped**: A new instance is created once per request (HTTP request in a web app).
+
+  ```csharp
+  builder.Services.AddScoped<IScopedService, ScopedService>();
+  ```
+
+* **Singleton**: A single instance is created for the lifetime of the application.
+
+  ```csharp
+  builder.Services.AddSingleton<ISingletonService, SingletonService>();
+  ```
+
+## Advanced DI Techniques
+
+* Using Factory Pattern with DI
+* Implementing Scoped Services with Async Context
+* DI in Middleware
+* Conditional DI (based on environment)
+
+## Watchouts
+
+* Avoid injecting too many dependencies (Constructor Over-Injection).
+* Use appropriate lifetime for services (Singleton for stateless services).
+* Be careful with Scoped services in Singleton.
+* Circular Dependencies should be avoided.
+* Avoid using static services with DI.
+
+## Summary
+
+### Question and Answer Mastery
+
+1. **What is Dependency Injection (DI)?**
+
+   * DI is a design pattern where dependencies are injected into a class rather than the class creating them.
+
+2. **Why should you use DI in ASP.NET Core?**
+
+   * It promotes loose coupling, enhances testability, and improves maintainability.
+
+3. **What are the three main service lifetimes in DI?**
+
+   * Transient, Scoped, and Singleton.
+
+4. **How do you register a service in DI in ASP.NET Core?**
+
+   * Using `builder.Services.AddTransient`, `AddScoped`, or `AddSingleton` methods in Program.cs.
+
+5. **What is Constructor Injection?**
+
+   * Dependency is provided through the constructor of the class.
+
+6. **What is Scoped Service?**
+
+   * A service instance is created once per HTTP request.
+
+7. **How does Singleton differ from Transient?**
+
+   * Singleton creates a single instance for the application's lifetime, while Transient creates a new instance on every request.
+
+8. **How do you resolve services manually?**
+
+   * Using `IServiceProvider.GetRequiredService<T>()`.
+
+9. **What is the risk of injecting Scoped services in Singleton?**
+
+   * Scoped service instances may become singletons when injected into a Singleton, leading to unexpected behavior.
+
+10. **How can you use DI in Middleware?**
+
+* By injecting services via the constructor of the Middleware class.
