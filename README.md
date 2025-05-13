@@ -361,3 +361,305 @@ public class OrderService
 
 * Use Observer Pattern when an object needs to notify multiple objects about state changes without tightly coupling them.
 
+# Mastering 20 Common Design Patterns in C\#
+
+## Introduction
+
+Design Patterns are proven solutions to common problems in software design. They provide templates for writing flexible, scalable, and maintainable code. This guide covers the 20 most common design patterns in C#, with full code implementations, detailed explanations, use cases, and best practices.
+
+## Section 1: Creational Patterns
+
+### 1. Singleton Pattern
+
+* **Definition:** Ensures a class has only one instance and provides a global access point.
+* **When to Use:** Use when you need to ensure only one instance of a class is created, such as a database connection.
+* **Similar Patterns to Learn:** Factory Method, Abstract Factory.
+
+```csharp
+public sealed class Singleton
+{
+    private static Singleton _instance = null;
+    private static readonly object _lock = new object();
+
+    private Singleton() { }
+
+    public static Singleton Instance
+    {
+        get
+        {
+            lock (_lock)
+            {
+                if (_instance == null)
+                    _instance = new Singleton();
+            }
+            return _instance;
+        }
+    }
+}
+```
+
+### 2. Factory Method Pattern
+
+* **Definition:** Provides an interface for creating objects without specifying their concrete classes.
+* **When to Use:** Use when you need to delegate object creation to subclasses.
+* **Similar Patterns to Learn:** Abstract Factory, Builder.
+
+```csharp
+public interface IVehicle
+{
+    void Drive();
+}
+
+public class Car : IVehicle
+{
+    public void Drive() => Console.WriteLine("Driving a car.");
+}
+
+public class Bike : IVehicle
+{
+    public void Drive() => Console.WriteLine("Riding a bike.");
+}
+
+public class VehicleFactory
+{
+    public static IVehicle CreateVehicle(string type)
+    {
+        return type switch
+        {
+            "Car" => new Car(),
+            "Bike" => new Bike(),
+            _ => throw new ArgumentException("Invalid vehicle type")
+        };
+    }
+}
+```
+
+### 3. Abstract Factory Pattern
+
+* **Definition:** Creates families of related objects without specifying their concrete classes.
+* **When to Use:** Use when your system needs to work with multiple related object families.
+* **Similar Patterns to Learn:** Factory Method, Prototype.
+
+```csharp
+public interface IGUIFactory
+{
+    IButton CreateButton();
+}
+
+public class WindowsFactory : IGUIFactory
+{
+    public IButton CreateButton() => new WindowsButton();
+}
+
+public class MacOSFactory : IGUIFactory
+{
+    public IButton CreateButton() => new MacOSButton();
+}
+```
+
+### 4. Builder Pattern
+
+* **Definition:** Separates the construction of a complex object from its representation.
+* **When to Use:** Use when you need to create a complex object step by step.
+* **Similar Patterns to Learn:** Factory Method, Prototype.
+
+```csharp
+public class Computer
+{
+    public string CPU { get; set; }
+    public string RAM { get; set; }
+    public string Storage { get; set; }
+}
+
+public class ComputerBuilder
+{
+    private Computer _computer = new Computer();
+
+    public ComputerBuilder SetCPU(string cpu)
+    {
+        _computer.CPU = cpu;
+        return this;
+    }
+
+    public Computer Build() => _computer;
+}
+```
+
+### 5. Prototype Pattern
+
+* **Definition:** Creates objects by copying an existing object (clone).
+* **When to Use:** Use when object creation is expensive or complex.
+* **Similar Patterns to Learn:** Builder, Abstract Factory.
+
+```csharp
+public class Shape
+{
+    public string Color { get; set; }
+
+    public Shape Clone()
+    {
+        return (Shape)this.MemberwiseClone();
+    }
+}
+```
+
+## Section 2: Structural Patterns
+
+### 6. Adapter Pattern
+
+* **Definition:** Converts the interface of a class into another interface clients expect.
+* **When to Use:** Use when you need to integrate classes with incompatible interfaces.
+* **Similar Patterns to Learn:** Bridge, Proxy.
+
+```csharp
+public interface ITarget
+{
+    void Request();
+}
+
+public class Adaptee
+{
+    public void SpecificRequest() => Console.WriteLine("Specific Request");
+}
+
+public class Adapter : ITarget
+{
+    private readonly Adaptee _adaptee = new Adaptee();
+
+    public void Request()
+    {
+        _adaptee.SpecificRequest();
+    }
+}
+```
+## 7. Bridge Pattern
+
+* **Definition:** Separates an abstraction from its implementation so that they can vary independently.
+* **When to Use:** Use when you want to decouple abstraction and implementation.
+* **Similar Patterns to Learn:** Adapter, Composite.
+
+```csharp
+public interface IRenderer
+{
+    void RenderShape(string shape);
+}
+
+public class VectorRenderer : IRenderer
+{
+    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with vectors");
+}
+
+public class RasterRenderer : IRenderer
+{
+    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with pixels");
+}
+
+public class Shape
+{
+    protected IRenderer renderer;
+
+    public Shape(IRenderer renderer)
+    {
+        this.renderer = renderer;
+    }
+}
+
+public class Circle : Shape
+{
+    public Circle(IRenderer renderer) : base(renderer) { }
+
+    public void Draw() => renderer.RenderShape("Circle");
+}
+```
+
+## 8. Composite Pattern
+
+* **Definition:** Composes objects into tree structures to represent part-whole hierarchies.
+* **When to Use:** Use when you need to work with tree-like structures.
+* **Similar Patterns to Learn:** Decorator, Flyweight.
+
+```csharp
+public interface IComponent
+{
+    void Display();
+}
+
+public class Leaf : IComponent
+{
+    public void Display() => Console.WriteLine("Leaf");
+}
+
+public class Composite : IComponent
+{
+    private readonly List<IComponent> _children = new List<IComponent>();
+
+    public void Add(IComponent component) => _children.Add(component);
+
+    public void Display()
+    {
+        Console.WriteLine("Composite");
+        foreach (var child in _children) child.Display();
+    }
+}
+```
+
+## 9. Decorator Pattern
+
+* **Definition:** Adds responsibilities to an object dynamically.
+* **When to Use:** Use when you need to add features to an object without modifying its class.
+* **Similar Patterns to Learn:** Proxy, Composite.
+
+```csharp
+public interface ICoffee
+{
+    string GetDescription();
+}
+
+public class BasicCoffee : ICoffee
+{
+    public string GetDescription() => "Basic Coffee";
+}
+
+public class MilkDecorator : ICoffee
+{
+    private readonly ICoffee _coffee;
+
+    public MilkDecorator(ICoffee coffee)
+    {
+        _coffee = coffee;
+    }
+
+    public string GetDescription() => _coffee.GetDescription() + ", Milk";
+}
+```
+
+## 10. Facade Pattern
+
+* **Definition:** Provides a unified interface to a set of interfaces in a subsystem.
+* **When to Use:** Use when you want to simplify complex subsystems.
+* **Similar Patterns to Learn:** Mediator, Adapter.
+
+```csharp
+public class SubsystemA
+{
+    public void OperationA() => Console.WriteLine("Subsystem A operation");
+}
+
+public class SubsystemB
+{
+    public void OperationB() => Console.WriteLine("Subsystem B operation");
+}
+
+public class Facade
+{
+    private readonly SubsystemA _subsystemA = new SubsystemA();
+    private readonly SubsystemB _subsystemB = new SubsystemB();
+
+    public void PerformOperations()
+    {
+        _subsystemA.OperationA();
+        _subsystemB.OperationB();
+    }
+}
+```
+
