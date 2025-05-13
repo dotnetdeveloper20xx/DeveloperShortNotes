@@ -919,4 +919,1039 @@ public class NumberExpression : IExpression
     public int Interpret() => _number;
 }
 ```
+# Design Patterns 16-20: Full Details with Code
 
+## 16. Mediator Pattern
+
+* **Definition:** Defines an object that encapsulates how a set of objects interact.
+* **When to Use:** Use when you want to centralize complex communication logic.
+* **Similar Patterns to Learn:** Observer, Facade.
+
+```csharp
+public interface IMediator
+{
+    void SendMessage(string message, User user);
+}
+
+public class ChatMediator : IMediator
+{
+    private readonly List<User> _users = new();
+
+    public void RegisterUser(User user) => _users.Add(user);
+
+    public void SendMessage(string message, User user)
+    {
+        foreach (var u in _users)
+        {
+            if (u != user) u.ReceiveMessage(message);
+        }
+    }
+}
+
+public class User
+{
+    private readonly IMediator _mediator;
+    public string Name { get; }
+
+    public User(IMediator mediator, string name)
+    {
+        _mediator = mediator;
+        Name = name;
+    }
+
+    public void Send(string message) => _mediator.SendMessage(message, this);
+    public void ReceiveMessage(string message) => Console.WriteLine($"{Name} received: {message}");
+}
+```
+
+## 17. Memento Pattern
+
+* **Definition:** Captures and restores an object's internal state without violating encapsulation.
+* **When to Use:** Use when you need to save and restore object states.
+* **Similar Patterns to Learn:** Command, Prototype.
+
+```csharp
+public class Editor
+{
+    public string Content { get; set; }
+
+    public EditorState Save() => new EditorState(Content);
+    public void Restore(EditorState state) => Content = state.Content;
+}
+
+public class EditorState
+{
+    public string Content { get; }
+
+    public EditorState(string content) => Content = content;
+}
+
+public class History
+{
+    private readonly Stack<EditorState> _states = new();
+
+    public void Push(EditorState state) => _states.Push(state);
+    public EditorState Pop() => _states.Pop();
+}
+```
+
+## 18. Observer Pattern
+
+* **Definition:** Defines a one-to-many dependency between objects so that when one object changes state, all dependents are notified.
+* **When to Use:** Use when you need to notify multiple objects of state changes.
+* **Similar Patterns to Learn:** Mediator, Event.
+
+```csharp
+public interface IObserver
+{
+    void Update(string message);
+}
+
+public class ConcreteObserver : IObserver
+{
+    public string Name { get; }
+
+    public ConcreteObserver(string name) => Name = name;
+
+    public void Update(string message) => Console.WriteLine($"{Name} received: {message}");
+}
+
+public class Subject
+{
+    private readonly List<IObserver> _observers = new();
+
+    public void Attach(IObserver observer) => _observers.Add(observer);
+    public void Notify(string message)
+    {
+        foreach (var observer in _observers)
+            observer.Update(message);
+    }
+}
+```
+
+## 19. State Pattern
+
+* **Definition:** Allows an object to change its behavior when its internal state changes.
+* **When to Use:** Use when an object’s behavior depends on its state.
+* **Similar Patterns to Learn:** Strategy, Command.
+
+```csharp
+public interface IState
+{
+    void Handle(Context context);
+}
+
+public class HappyState : IState
+{
+    public void Handle(Context context) => Console.WriteLine("I am happy!");
+}
+
+public class SadState : IState
+{
+    public void Handle(Context context) => Console.WriteLine("I am sad.");
+}
+
+public class Context
+{
+    private IState _state;
+
+    public void SetState(IState state) => _state = state;
+    public void Request() => _state?.Handle(this);
+}
+```
+
+## 20. Strategy Pattern
+
+* **Definition:** Defines a family of algorithms, encapsulates each one, and makes them interchangeable.
+* **When to Use:** Use when you need to switch between multiple algorithms at runtime.
+* **Similar Patterns to Learn:** State, Template Method.
+
+```csharp
+public interface IStrategy
+{
+    int Execute(int a, int b);
+}
+
+public class AdditionStrategy : IStrategy
+{
+    public int Execute(int a, int b) => a + b;
+}
+
+public class SubtractionStrategy : IStrategy
+{
+    public int Execute(int a, int b) => a - b;
+}
+
+public class Calculator
+{
+    private IStrategy _strategy;
+
+    public void SetStrategy(IStrategy strategy) => _strategy = strategy;
+
+    public int Calculate(int a, int b) => _strategy.Execute(a, b);
+}
+```
+
+# Design Patterns 21-25: Full Details with Code
+
+## 21. Template Method Pattern
+
+* **Definition:** Defines the skeleton of an algorithm in a base class but lets subclasses override specific steps without changing the algorithm’s structure.
+* **When to Use:** Use when you have an algorithm with common steps, but some steps may vary.
+* **Similar Patterns to Learn:** Strategy, State.
+
+```csharp
+public abstract class DataProcessor
+{
+    public void ProcessData()
+    {
+        LoadData();
+        ProcessDataInternal();
+        SaveData();
+    }
+
+    protected abstract void LoadData();
+    protected abstract void ProcessDataInternal();
+
+    protected virtual void SaveData() => Console.WriteLine("Data saved.");
+}
+
+public class CsvProcessor : DataProcessor
+{
+    protected override void LoadData() => Console.WriteLine("CSV data loaded.");
+
+    protected override void ProcessDataInternal() => Console.WriteLine("Processing CSV data.");
+}
+
+public class JsonProcessor : DataProcessor
+{
+    protected override void LoadData() => Console.WriteLine("JSON data loaded.");
+
+    protected override void ProcessDataInternal() => Console.WriteLine("Processing JSON data.");
+}
+```
+
+## 22. Visitor Pattern
+
+* **Definition:** Allows you to add further operations to objects without modifying their classes.
+* **When to Use:** Use when you need to perform different operations on objects of different classes without modifying them.
+* **Similar Patterns to Learn:** Composite, Iterator.
+
+```csharp
+public interface IElement
+{
+    void Accept(IVisitor visitor);
+}
+
+public class Document : IElement
+{
+    public void Accept(IVisitor visitor) => visitor.Visit(this);
+}
+
+public class Image : IElement
+{
+    public void Accept(IVisitor visitor) => visitor.Visit(this);
+}
+
+public interface IVisitor
+{
+    void Visit(Document document);
+    void Visit(Image image);
+}
+
+public class PrintVisitor : IVisitor
+{
+    public void Visit(Document document) => Console.WriteLine("Printing document.");
+    public void Visit(Image image) => Console.WriteLine("Printing image.");
+}
+```
+
+## 23. Iterator Pattern
+
+* **Definition:** Provides a way to access the elements of a collection sequentially without exposing the underlying structure.
+* **When to Use:** Use when you need to iterate over a collection without exposing its implementation.
+* **Similar Patterns to Learn:** Composite, Visitor.
+
+```csharp
+public interface IIterator<T>
+{
+    bool HasNext();
+    T Next();
+}
+
+public class ListIterator<T> : IIterator<T>
+{
+    private readonly List<T> _collection;
+    private int _currentIndex = 0;
+
+    public ListIterator(List<T> collection) => _collection = collection;
+
+    public bool HasNext() => _currentIndex < _collection.Count;
+
+    public T Next() => _collection[_currentIndex++];
+}
+```
+
+## 24. Chain of Responsibility Pattern (Advanced)
+
+* **Definition:** Passes a request along a chain of handlers where each handler decides whether to handle the request.
+* **When to Use:** Use when multiple handlers may process a request, and the handler isn't predetermined.
+* **Similar Patterns to Learn:** Command, Mediator.
+
+```csharp
+public abstract class AdvancedHandler
+{
+    protected AdvancedHandler Next;
+
+    public void SetNext(AdvancedHandler next) => Next = next;
+
+    public abstract void HandleRequest(string request);
+}
+
+public class LoggingHandler : AdvancedHandler
+{
+    public override void HandleRequest(string request)
+    {
+        Console.WriteLine("Logging request.");
+        Next?.HandleRequest(request);
+    }
+}
+
+public class AuthenticationHandler : AdvancedHandler
+{
+    public override void HandleRequest(string request)
+    {
+        Console.WriteLine("Authenticating request.");
+        Next?.HandleRequest(request);
+    }
+}
+```
+
+## 25. Null Object Pattern
+
+* **Definition:** Provides a default behavior for absent or null objects.
+* **When to Use:** Use when you want to avoid null checks by providing a default implementation.
+* **Similar Patterns to Learn:** Strategy, Singleton.
+
+```csharp
+public interface ICustomer
+{
+    void Purchase();
+}
+
+public class RealCustomer : ICustomer
+{
+    public void Purchase() => Console.WriteLine("Customer made a purchase.");
+}
+
+public class NullCustomer : ICustomer
+{
+    public void Purchase() => Console.WriteLine("No customer to process.");
+}
+```
+# Design Patterns 26-30: Full Details with Code
+
+## 26. Singleton (Thread-Safe, Lazy Initialization)
+
+* **Definition:** Ensures a class has only one instance, with thread-safe lazy initialization.
+* **When to Use:** Use when you need a single instance of a class, and it must be created only when needed.
+* **Similar Patterns to Learn:** Simple Singleton, Factory Method.
+
+```csharp
+public sealed class ThreadSafeSingleton
+{
+    private static readonly Lazy<ThreadSafeSingleton> _instance = new Lazy<ThreadSafeSingleton>(() => new ThreadSafeSingleton());
+
+    private ThreadSafeSingleton() { }
+
+    public static ThreadSafeSingleton Instance => _instance.Value;
+}
+```
+
+## 27. Static Factory Pattern
+
+* **Definition:** Provides a static method to create and return instances of classes.
+* **When to Use:** Use when you want to centralize object creation without exposing constructors.
+* **Similar Patterns to Learn:** Factory Method, Abstract Factory.
+
+```csharp
+public class User
+{
+    public string Name { get; private set; }
+
+    private User(string name)
+    {
+        Name = name;
+    }
+
+    public static User CreateAdmin(string name) => new User(name + " (Admin)");
+
+    public static User CreateGuest() => new User("Guest");
+}
+```
+
+## 28. Prototype Pattern (Deep Clone)
+
+* **Definition:** Creates a copy of an existing object, including deep copy of its fields.
+* **When to Use:** Use when cloning complex objects with nested references.
+* **Similar Patterns to Learn:** Shallow Prototype, Builder.
+
+```csharp
+[Serializable]
+public class DeepClonePrototype
+{
+    public string Name { get; set; }
+    public List<string> Items { get; set; } = new();
+
+    public DeepClonePrototype DeepClone()
+    {
+        using (var stream = new MemoryStream())
+        {
+            var formatter = new BinaryFormatter();
+            formatter.Serialize(stream, this);
+            stream.Seek(0, SeekOrigin.Begin);
+            return (DeepClonePrototype)formatter.Deserialize(stream);
+        }
+    }
+}
+```
+
+## 29. Object Pool Pattern
+
+* **Definition:** Manages a pool of reusable objects, reducing the overhead of object creation.
+* **When to Use:** Use when objects are expensive to create, but can be reused.
+* **Similar Patterns to Learn:** Factory Method, Singleton.
+
+```csharp
+public class Connection
+{
+    public void Connect() => Console.WriteLine("Connected.");
+}
+
+public class ConnectionPool
+{
+    private readonly Queue<Connection> _pool = new();
+
+    public Connection GetConnection()
+    {
+        return _pool.Count > 0 ? _pool.Dequeue() : new Connection();
+    }
+
+    public void ReturnConnection(Connection conn)
+    {
+        _pool.Enqueue(conn);
+    }
+}
+```
+
+## 30. Lazy Initialization Pattern
+
+* **Definition:** Defers object creation until it is actually needed, improving performance.
+* **When to Use:** Use when creating an object is resource-intensive, and it may not always be needed.
+* **Similar Patterns to Learn:** Singleton, Factory Method.
+
+```csharp
+public class HeavyObject
+{
+    private Lazy<string> _data = new(() => LoadData());
+
+    private static string LoadData()
+    {
+        Console.WriteLine("Loading heavy data...");
+        return "Heavy Data Loaded";
+    }
+
+    public string GetData() => _data.Value;
+}
+```
+# Design Patterns 31-35: Full Details with Code
+
+## 31. Dependency Injection Pattern
+
+* **Definition:** A technique where an object receives its dependencies from an external source rather than creating them internally.
+* **When to Use:** Use when you want to promote loose coupling and make code testable.
+* **Similar Patterns to Learn:** Inversion of Control, Service Locator.
+
+```csharp
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class ConsoleLogger : ILogger
+{
+    public void Log(string message) => Console.WriteLine(message);
+}
+
+public class OrderService
+{
+    private readonly ILogger _logger;
+
+    public OrderService(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public void ProcessOrder()
+    {
+        _logger.Log("Order processed.");
+    }
+}
+
+// Usage
+var service = new OrderService(new ConsoleLogger());
+service.ProcessOrder();
+```
+
+## 32. Service Locator Pattern
+
+* **Definition:** Provides a centralized point to obtain services, avoiding direct instantiation.
+* **When to Use:** Use when you have a large number of services that you want to manage centrally.
+* **Similar Patterns to Learn:** Dependency Injection, Factory.
+
+```csharp
+public class ServiceLocator
+{
+    private static readonly Dictionary<string, object> _services = new();
+
+    public static void RegisterService<T>(T service) => _services[typeof(T).Name] = service;
+
+    public static T GetService<T>() => (T)_services[typeof(T).Name];
+}
+
+// Usage
+ServiceLocator.RegisterService<ILogger>(new ConsoleLogger());
+var logger = ServiceLocator.GetService<ILogger>();
+logger.Log("Service Locator Pattern.");
+```
+
+## 33. Fluent Interface Pattern
+
+* **Definition:** Provides a fluent, method-chaining syntax for object creation or configuration.
+* **When to Use:** Use when you want a readable, chained API for configuration.
+* **Similar Patterns to Learn:** Builder, Factory.
+
+```csharp
+public class FluentCar
+{
+    private string _make;
+    private string _model;
+
+    public FluentCar SetMake(string make)
+    {
+        _make = make;
+        return this;
+    }
+
+    public FluentCar SetModel(string model)
+    {
+        _model = model;
+        return this;
+    }
+
+    public void Display() => Console.WriteLine($"Car: {_make} {_model}");
+}
+
+// Usage
+new FluentCar().SetMake("Tesla").SetModel("Model S").Display();
+```
+
+## 34. Double-Checked Locking Pattern
+
+* **Definition:** A technique to ensure a singleton is created only once in a multi-threaded environment.
+* **When to Use:** Use when you need a thread-safe singleton with high performance.
+* **Similar Patterns to Learn:** Thread-Safe Singleton, Lazy Initialization.
+
+```csharp
+public sealed class DoubleCheckedSingleton
+{
+    private static DoubleCheckedSingleton _instance;
+    private static readonly object _lock = new object();
+
+    private DoubleCheckedSingleton() { }
+
+    public static DoubleCheckedSingleton Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                lock (_lock)
+                {
+                    if (_instance == null)
+                        _instance = new DoubleCheckedSingleton();
+                }
+            }
+            return _instance;
+        }
+    }
+}
+```
+
+## 35. Event Aggregator Pattern
+
+* **Definition:** Manages events and their handlers in a centralized way.
+* **When to Use:** Use when you need to decouple event producers and consumers.
+* **Similar Patterns to Learn:** Observer, Mediator.
+
+```csharp
+public class EventAggregator
+{
+    private readonly List<Action<string>> _subscribers = new();
+
+    public void Subscribe(Action<string> subscriber) => _subscribers.Add(subscriber);
+
+    public void Publish(string message)
+    {
+        foreach (var subscriber in _subscribers)
+        {
+            subscriber(message);
+        }
+    }
+}
+
+// Usage
+var aggregator = new EventAggregator();
+aggregator.Subscribe(msg => Console.WriteLine("Subscriber 1: " + msg));
+aggregator.Subscribe(msg => Console.WriteLine("Subscriber 2: " + msg));
+aggregator.Publish("Hello World");
+```
+# Design Patterns 36-40: Full Details with Code
+
+## 36. Adapter Pattern (Advanced)
+
+* **Definition:** Converts the interface of a class into another interface clients expect.
+* **When to Use:** Use when you need to integrate classes with incompatible interfaces.
+* **Similar Patterns to Learn:** Bridge, Proxy.
+
+```csharp
+public interface IAdvancedTarget
+{
+    string GetAdvancedData();
+}
+
+public class AdvancedService
+{
+    public string FetchData() => "Advanced Data";
+}
+
+public class AdvancedAdapter : IAdvancedTarget
+{
+    private readonly AdvancedService _service = new();
+
+    public string GetAdvancedData() => _service.FetchData();
+}
+
+// Usage
+IAdvancedTarget target = new AdvancedAdapter();
+Console.WriteLine(target.GetAdvancedData());
+```
+
+## 37. Repository Pattern
+
+* **Definition:** Provides an abstraction layer for data access, centralizing data management.
+* **When to Use:** Use when you want to separate data access logic from business logic.
+* **Similar Patterns to Learn:** DAO, Unit of Work.
+
+```csharp
+public interface IRepository<T>
+{
+    void Add(T item);
+    IEnumerable<T> GetAll();
+}
+
+public class ProductRepository : IRepository<string>
+{
+    private readonly List<string> _products = new();
+
+    public void Add(string product) => _products.Add(product);
+
+    public IEnumerable<string> GetAll() => _products;
+}
+
+// Usage
+var repo = new ProductRepository();
+repo.Add("Product A");
+repo.Add("Product B");
+Console.WriteLine(string.Join(", ", repo.GetAll()));
+```
+
+## 38. Specification Pattern
+
+* **Definition:** Combines business rules using logical operators (AND, OR, NOT).
+* **When to Use:** Use when you need to build complex queries with reusable conditions.
+* **Similar Patterns to Learn:** Composite, Strategy.
+
+```csharp
+public interface ISpecification<T>
+{
+    bool IsSatisfiedBy(T item);
+}
+
+public class AgeSpecification : ISpecification<int>
+{
+    private readonly int _minAge;
+
+    public AgeSpecification(int minAge) => _minAge = minAge;
+
+    public bool IsSatisfiedBy(int age) => age >= _minAge;
+}
+
+// Usage
+var ageSpec = new AgeSpecification(18);
+Console.WriteLine(ageSpec.IsSatisfiedBy(20)); // True
+```
+
+## 39. Unit of Work Pattern
+
+* **Definition:** Manages a set of changes to be committed as a single transaction.
+* **When to Use:** Use when you need to maintain consistency across multiple data operations.
+* **Similar Patterns to Learn:** Repository, Transaction Script.
+
+```csharp
+public class UnitOfWork
+{
+    private readonly List<string> _operations = new();
+
+    public void AddOperation(string operation) => _operations.Add(operation);
+
+    public void Commit()
+    {
+        Console.WriteLine("Committing operations:");
+        foreach (var op in _operations)
+            Console.WriteLine(op);
+    }
+}
+
+// Usage
+var uow = new UnitOfWork();
+uow.AddOperation("Insert Order");
+uow.AddOperation("Update Inventory");
+uow.Commit();
+```
+
+## 40. Transaction Script Pattern
+
+* **Definition:** Encapsulates each business operation in a separate method, providing clear transaction logic.
+* **When to Use:** Use when you need to maintain clear, isolated business logic for transactions.
+* **Similar Patterns to Learn:** Unit of Work, Command.
+
+```csharp
+public class OrderService
+{
+    public void ProcessOrder()
+    {
+        Console.WriteLine("Starting Transaction...");
+        Console.WriteLine("Processing Order...");
+        Console.WriteLine("Committing Transaction...");
+    }
+}
+
+// Usage
+var orderService = new OrderService();
+orderService.ProcessOrder();
+```
+# Design Patterns 41-45: Full Details with Code
+
+## 41. Interceptor Pattern
+
+* **Definition:** Allows behavior to be added to an object dynamically before or after its execution.
+* **When to Use:** Use when you want to add pre-processing or post-processing logic to method execution.
+* **Similar Patterns to Learn:** Decorator, Proxy.
+
+```csharp
+public interface IRequestHandler
+{
+    void Handle(string request);
+}
+
+public class ConcreteHandler : IRequestHandler
+{
+    public void Handle(string request) => Console.WriteLine($"Handling request: {request}");
+}
+
+public class Interceptor : IRequestHandler
+{
+    private readonly IRequestHandler _handler;
+
+    public Interceptor(IRequestHandler handler) => _handler = handler;
+
+    public void Handle(string request)
+    {
+        Console.WriteLine("Before handling");
+        _handler.Handle(request);
+        Console.WriteLine("After handling");
+    }
+}
+
+// Usage
+var handler = new Interceptor(new ConcreteHandler());
+handler.Handle("Login Request");
+```
+
+## 42. Null Object Pattern (Advanced)
+
+* **Definition:** Provides a default behavior for absent or null objects, avoiding null checks.
+* **When to Use:** Use when you want to avoid null checks by providing a default implementation.
+* **Similar Patterns to Learn:** Singleton, Strategy.
+
+```csharp
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class ConsoleLogger : ILogger
+{
+    public void Log(string message) => Console.WriteLine(message);
+}
+
+public class NullLogger : ILogger
+{
+    public void Log(string message) { /* Do nothing */ }
+}
+
+// Usage
+ILogger logger = new NullLogger();
+logger.Log("This will not be logged.");
+```
+
+## 43. Active Record Pattern
+
+* **Definition:** Encapsulates data access logic within the entity classes themselves.
+* **When to Use:** Use when you want to combine data access and business logic in one class.
+* **Similar Patterns to Learn:** Repository, Unit of Work.
+
+```csharp
+public class ActiveRecord
+{
+    private static List<string> _data = new();
+
+    public string Name { get; set; }
+
+    public void Save() => _data.Add(Name);
+
+    public static IEnumerable<string> GetAll() => _data;
+}
+
+// Usage
+var record = new ActiveRecord { Name = "John" };
+record.Save();
+Console.WriteLine(string.Join(", ", ActiveRecord.GetAll()));
+```
+
+## 44. Role Object Pattern
+
+* **Definition:** Attaches multiple roles (behaviors) to a single object at runtime.
+* **When to Use:** Use when an object can have multiple behaviors dynamically.
+* **Similar Patterns to Learn:** Strategy, State.
+
+```csharp
+public interface IRole
+{
+    void Execute();
+}
+
+public class AdminRole : IRole
+{
+    public void Execute() => Console.WriteLine("Admin Permissions.");
+}
+
+public class UserRole : IRole
+{
+    public void Execute() => Console.WriteLine("User Permissions.");
+}
+
+public class User
+{
+    private readonly List<IRole> _roles = new();
+
+    public void AddRole(IRole role) => _roles.Add(role);
+
+    public void PerformActions()
+    {
+        foreach (var role in _roles)
+            role.Execute();
+    }
+}
+
+// Usage
+var user = new User();
+user.AddRole(new AdminRole());
+user.AddRole(new UserRole());
+user.PerformActions();
+```
+
+## 45. Event Sourcing Pattern
+
+* **Definition:** Stores changes to an application's state as a sequence of events.
+* **When to Use:** Use when you need to keep a full history of state changes.
+* **Similar Patterns to Learn:** CQRS, Observer.
+
+```csharp
+public class EventStore
+{
+    private readonly List<string> _events = new();
+
+    public void SaveEvent(string eventDescription) => _events.Add(eventDescription);
+
+    public IEnumerable<string> GetEvents() => _events;
+}
+
+// Usage
+var eventStore = new EventStore();
+eventStore.SaveEvent("User registered.");
+eventStore.SaveEvent("User logged in.");
+Console.WriteLine(string.Join("\n", eventStore.GetEvents()));
+```
+# Design Patterns 46-50: Full Details with Code
+
+## 46. CQRS (Command Query Responsibility Segregation)
+
+* **Definition:** Separates read and write operations for better scalability and flexibility.
+* **When to Use:** Use when you want to optimize read and write operations separately.
+* **Similar Patterns to Learn:** Event Sourcing, Command.
+
+```csharp
+// Command (Write)
+public class CreateOrderCommand
+{
+    public string ProductName { get; set; }
+    public int Quantity { get; set; }
+}
+
+public class OrderHandler
+{
+    public void Handle(CreateOrderCommand command)
+    {
+        Console.WriteLine($"Order created: {command.ProductName} x {command.Quantity}");
+    }
+}
+
+// Query (Read)
+public class OrderQuery
+{
+    public string GetOrderDetails() => "Order Details: Product X, Quantity: 2";
+}
+
+// Usage
+var handler = new OrderHandler();
+handler.Handle(new CreateOrderCommand { ProductName = "Laptop", Quantity = 1 });
+
+var query = new OrderQuery();
+Console.WriteLine(query.GetOrderDetails());
+```
+
+## 47. Message Broker Pattern
+
+* **Definition:** Manages communication between multiple services using messages.
+* **When to Use:** Use when you want to decouple communication between services.
+* **Similar Patterns to Learn:** Event Sourcing, Mediator.
+
+```csharp
+public class MessageBroker
+{
+    private readonly List<Action<string>> _subscribers = new();
+
+    public void Subscribe(Action<string> subscriber) => _subscribers.Add(subscriber);
+
+    public void Publish(string message)
+    {
+        foreach (var subscriber in _subscribers)
+        {
+            subscriber(message);
+        }
+    }
+}
+
+// Usage
+var broker = new MessageBroker();
+broker.Subscribe(msg => Console.WriteLine("Subscriber 1 received: " + msg));
+broker.Publish("Hello World");
+```
+
+## 48. Observer (Advanced with Delegates)
+
+* **Definition:** Defines a one-to-many dependency, using delegates for flexible notifications.
+* **When to Use:** Use when you want a lightweight observer implementation.
+* **Similar Patterns to Learn:** Mediator, Event.
+
+```csharp
+public class AdvancedPublisher
+{
+    public event Action<string> Notify;
+
+    public void Publish(string message) => Notify?.Invoke(message);
+}
+
+// Usage
+var publisher = new AdvancedPublisher();
+publisher.Notify += msg => Console.WriteLine("Observer 1: " + msg);
+publisher.Notify += msg => Console.WriteLine("Observer 2: " + msg);
+publisher.Publish("Advanced Notification");
+```
+
+## 49. State Machine Pattern
+
+* **Definition:** Manages an object’s behavior using a state machine that transitions between predefined states.
+* **When to Use:** Use when an object’s behavior depends on its state.
+* **Similar Patterns to Learn:** State, Strategy.
+
+```csharp
+public enum TrafficLightState { Red, Yellow, Green }
+
+public class TrafficLight
+{
+    private TrafficLightState _state = TrafficLightState.Red;
+
+    public void ChangeState()
+    {
+        _state = _state switch
+        {
+            TrafficLightState.Red => TrafficLightState.Green,
+            TrafficLightState.Green => TrafficLightState.Yellow,
+            _ => TrafficLightState.Red
+        };
+
+        Console.WriteLine($"Current State: {_state}");
+    }
+}
+
+// Usage
+var light = new TrafficLight();
+light.ChangeState(); // Green
+light.ChangeState(); // Yellow
+light.ChangeState(); // Red
+```
+
+## 50. Hexagonal Architecture (Ports and Adapters)
+
+* **Definition:** Promotes a clean architecture by decoupling core logic from external systems.
+* **When to Use:** Use when you want a highly maintainable, testable architecture.
+* **Similar Patterns to Learn:** Clean Architecture, Dependency Injection.
+
+```csharp
+// Application Core
+public interface IOrderService
+{
+    void PlaceOrder(string product);
+}
+
+public class OrderService : IOrderService
+{
+    public void PlaceOrder(string product) => Console.WriteLine($"Order placed: {product}");
+}
+
+// Infrastructure (Adapter)
+public class EmailNotification
+{
+    public void SendEmail(string message) => Console.WriteLine("Email sent: " + message);
+}
+
+// Usage
+var orderService = new OrderService();
+var emailNotification = new EmailNotification();
+
+orderService.PlaceOrder("Book");
+emailNotification.SendEmail("Your order for Book is confirmed.");
+```
