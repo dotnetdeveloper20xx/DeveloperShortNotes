@@ -1894,103 +1894,673 @@ Drawing Circle with color Blue
 ---
 
 
-## 12. Proxy Pattern
+## 12.  Proxy Pattern 
 
-* **Definition:** Provides a surrogate or placeholder for another object to control access.
-* **When to Use:** Use when you need to control access to an object.
-* **Similar Patterns to Learn:** Decorator, Adapter.
+## 1. Definition
+
+The Proxy Pattern is a structural design pattern that provides a surrogate or placeholder for another object to control access to it. It is used to create an intermediary object that controls access to another object, often for purposes like access control, lazy initialization, logging, or caching.
+
+## 2. When to Use
+
+* When you want to control access to a resource-intensive object.
+* When you need to add security or logging without modifying the original object.
+* When you want to perform lazy initialization (create the object only when it is needed).
+* When you want to control access to a remote object.
+
+## 3. Key Components
+
+* **Subject Interface:** Defines the common interface for RealSubject and Proxy.
+* **RealSubject:** The actual object that the proxy represents.
+* **Proxy:** The surrogate or placeholder object that controls access to the RealSubject.
+
+## 4. Real-World Analogy
+
+Imagine a security guard (Proxy) controlling access to a secure building (RealSubject). The guard checks the identity of people (access control) before letting them enter the building.
+
+## 5. Full Code Example
 
 ```csharp
-public interface IService
+using System;
+
+// Subject Interface
+public interface IReportGenerator
 {
-    void Execute();
+    void GenerateReport();
 }
 
-public class RealService : IService
+// RealSubject
+public class ReportGenerator : IReportGenerator
 {
-    public void Execute() => Console.WriteLine("Real service executed.");
-}
-
-public class ProxyService : IService
-{
-    private readonly RealService _realService = new();
-
-    public void Execute()
+    public void GenerateReport()
     {
-        Console.WriteLine("Proxy controlling access.");
-        _realService.Execute();
+        Console.WriteLine("Generating a complex report...");
+    }
+}
+
+// Proxy
+public class ReportGeneratorProxy : IReportGenerator
+{
+    private ReportGenerator _realReportGenerator;
+    private bool _hasAccess;
+
+    public ReportGeneratorProxy(bool hasAccess)
+    {
+        _hasAccess = hasAccess;
+    }
+
+    public void GenerateReport()
+    {
+        if (_hasAccess)
+        {
+            if (_realReportGenerator == null)
+            {
+                _realReportGenerator = new ReportGenerator();
+            }
+            _realReportGenerator.GenerateReport();
+        }
+        else
+        {
+            Console.WriteLine("Access denied: You do not have the necessary permissions.");
+        }
+    }
+}
+
+// Client Code
+class Program
+{
+    static void Main()
+    {
+        IReportGenerator proxyWithAccess = new ReportGeneratorProxy(true);
+        proxyWithAccess.GenerateReport();
+
+        IReportGenerator proxyWithoutAccess = new ReportGeneratorProxy(false);
+        proxyWithoutAccess.GenerateReport();
     }
 }
 ```
 
-## 13. Chain of Responsibility Pattern
+## 6. Benefits
 
-* **Definition:** Passes a request along a chain of handlers.
-* **When to Use:** Use when you have multiple handlers for a request.
-* **Similar Patterns to Learn:** Command, Mediator.
+* Adds control over access to an object.
+* Supports lazy initialization of resource-heavy objects.
+* Enhances security and logging without modifying the original object.
+
+## 7. Similar Patterns to Learn
+
+* **Decorator Pattern:** Adds functionality to an object without altering its structure.
+* **Adapter Pattern:** Makes incompatible interfaces work together.
+* **Facade Pattern:** Provides a simplified interface to a complex subsystem.
+
+## 8. Common Mistakes
+
+* Misunderstanding the difference between Proxy and Decorator (Proxy controls access; Decorator adds behavior).
+* Overusing the Proxy Pattern where simpler solutions are more appropriate.
+* Allowing Proxy to become too complex, violating the Single Responsibility Principle.
+
+## 9. 10 Interview Questions with Detailed Answers
+
+1. **What is the Proxy Pattern?**
+
+   * Answer: The Proxy Pattern is a structural design pattern that provides a surrogate or placeholder for another object to control access to it.
+
+2. **When should you use a Proxy Pattern?**
+
+   * Answer: Use it when you need to control access to a resource-heavy object, add security, logging, or lazy initialization.
+
+3. **How does Proxy differ from Decorator Pattern?**
+
+   * Answer: Proxy controls access, while Decorator adds behavior without changing the object’s interface.
+
+4. **What are the types of Proxies?**
+
+   * Answer: Virtual Proxy, Remote Proxy, Protection Proxy, Smart Proxy.
+
+5. **Can you give a real-world analogy of Proxy Pattern?**
+
+   * Answer: A security guard controlling access to a secure building.
+
+6. **What are the main components of Proxy Pattern?**
+
+   * Answer: Subject Interface, RealSubject, Proxy.
+
+7. **How does lazy initialization work in Proxy?**
+
+   * Answer: The Proxy creates the RealSubject only when it is needed.
+
+8. **Can Proxy Pattern be used for caching?**
+
+   * Answer: Yes, Proxy can control access and cache the results of a resource-intensive operation.
+
+9. **How does Protection Proxy work?**
+
+   * Answer: It restricts access based on user roles or permissions.
+
+10. **What are the potential downsides of using Proxy Pattern?**
+
+    * Answer: Increased complexity, potential for misuse, and risk of violating the Single Responsibility Principle.
+
+
+## 13. Chain of Responsibility Pattern 
+
+## 1. Definition
+
+The Chain of Responsibility Pattern is a behavioral design pattern that allows an object to pass a request along a chain of handlers. Each handler decides either to process the request or to pass it to the next handler in the chain.
+
+## 2. When to Use
+
+* When you have multiple objects that can handle a request, but the handler should be determined at runtime.
+* When you want to decouple sender and receiver of a request.
+* When you want to avoid excessive if-else or switch-case conditions in your code.
+
+## 3. Key Components
+
+* **Handler (Abstract Class or Interface):** Declares a method to process a request and holds a reference to the next handler.
+* **Concrete Handler:** Implements the handler interface and decides if it can process the request or pass it to the next handler.
+* **Client:** Initiates the request and passes it to the chain of handlers.
+
+## 4. Real-World Analogy
+
+Imagine a customer support system with multiple support levels (Level 1, Level 2, and Manager). If Level 1 cannot handle a customer query, it forwards the request to Level 2, and so on, until the query is resolved.
+
+## 5. Full Code Example
 
 ```csharp
-public abstract class Handler
-{
-    protected Handler Next;
+using System;
 
-    public void SetNext(Handler next) => Next = next;
+// Handler Interface
+public abstract class SupportHandler
+{
+    protected SupportHandler _nextHandler;
+
+    public void SetNextHandler(SupportHandler nextHandler)
+    {
+        _nextHandler = nextHandler;
+    }
+
     public abstract void HandleRequest(string request);
 }
 
-public class AuthHandler : Handler
+// Concrete Handler 1
+public class LevelOneSupport : SupportHandler
 {
     public override void HandleRequest(string request)
     {
-        Console.WriteLine("Authenticating request.");
-        Next?.HandleRequest(request);
+        if (request == "Simple Query")
+        {
+            Console.WriteLine("Level 1 Support: Handled Simple Query.");
+        }
+        else if (_nextHandler != null)
+        {
+            _nextHandler.HandleRequest(request);
+        }
+        else
+        {
+            Console.WriteLine("Request could not be handled.");
+        }
+    }
+}
+
+// Concrete Handler 2
+public class LevelTwoSupport : SupportHandler
+{
+    public override void HandleRequest(string request)
+    {
+        if (request == "Intermediate Query")
+        {
+            Console.WriteLine("Level 2 Support: Handled Intermediate Query.");
+        }
+        else if (_nextHandler != null)
+        {
+            _nextHandler.HandleRequest(request);
+        }
+        else
+        {
+            Console.WriteLine("Request could not be handled.");
+        }
+    }
+}
+
+// Concrete Handler 3
+public class ManagerSupport : SupportHandler
+{
+    public override void HandleRequest(string request)
+    {
+        Console.WriteLine("Manager Support: Handled any remaining query.");
+    }
+}
+
+// Client Code
+class Program
+{
+    static void Main()
+    {
+        SupportHandler levelOne = new LevelOneSupport();
+        SupportHandler levelTwo = new LevelTwoSupport();
+        SupportHandler manager = new ManagerSupport();
+
+        levelOne.SetNextHandler(levelTwo);
+        levelTwo.SetNextHandler(manager);
+
+        Console.WriteLine("--- Sending Simple Query ---");
+        levelOne.HandleRequest("Simple Query");
+
+        Console.WriteLine("--- Sending Intermediate Query ---");
+        levelOne.HandleRequest("Intermediate Query");
+
+        Console.WriteLine("--- Sending Complex Query ---");
+        levelOne.HandleRequest("Complex Query");
     }
 }
 ```
 
-## 14. Command Pattern
+## 6. Benefits
 
-* **Definition:** Encapsulates a request as an object.
-* **When to Use:** Use when you need to parameterize objects with actions.
-* **Similar Patterns to Learn:** Chain of Responsibility, Mediator.
+* Reduces coupling between sender and receiver.
+* Supports flexibility in changing the chain of handlers.
+* Makes it easy to add new handlers without modifying existing code.
+
+## 7. Similar Patterns to Learn
+
+* **Command Pattern:** Encapsulates a request as an object.
+* **Observer Pattern:** Notifies multiple objects of state changes.
+* **Mediator Pattern:** Controls communication between objects.
+
+## 8. Common Mistakes
+
+* Creating a rigid chain without flexibility to modify handlers.
+* Allowing handlers to become too complex, violating Single Responsibility.
+* Forgetting to set the next handler, leading to null reference exceptions.
+
+## 9. 10 Interview Questions with Detailed Answers
+
+1. **What is the Chain of Responsibility Pattern?**
+
+   * Answer: A behavioral pattern that allows a request to pass through a chain of handlers until one handles it.
+
+2. **When should you use Chain of Responsibility?**
+
+   * Answer: When multiple objects can handle a request, and the handler should be determined at runtime.
+
+3. **How does it differ from a Switch Case?**
+
+   * Answer: Switch case is a static structure, while Chain of Responsibility is dynamic and can be changed at runtime.
+
+4. **What are the key components of this pattern?**
+
+   * Answer: Handler Interface, Concrete Handler, Client.
+
+5. **What is the role of the Client in this pattern?**
+
+   * Answer: The Client initializes the request and passes it to the chain.
+
+6. **How do you create a chain of handlers?**
+
+   * Answer: By linking handlers using a reference to the next handler.
+
+7. **What are common real-world uses of this pattern?**
+
+   * Answer: Customer support systems, middleware chains in web applications, and event handling.
+
+8. **How do you avoid tight coupling in this pattern?**
+
+   * Answer: By using an abstract handler and setting the next handler dynamically.
+
+9. **What is the risk of a broken chain?**
+
+   * Answer: Requests may not be handled if the next handler is not set properly.
+
+10. **How do you add a new handler to an existing chain?**
+
+    * Answer: Create the new handler and set it as the next handler for an existing handler in the chain.
+
+
+## 14.  Command Pattern 
+
+## 1. Definition
+
+The Command Pattern is a behavioral design pattern that turns a request into a stand-alone object containing all the information needed to perform an action. It decouples the sender of a request from the object that executes it.
+
+## 2. When to Use
+
+* When you want to parameterize objects with operations (e.g., undo/redo functionality).
+* When you want to queue or log requests.
+* When you want to support operations that can be executed, undone, or re-executed.
+
+## 3. Key Components
+
+* **Command Interface:** Declares the method for executing a command.
+* **Concrete Command:** Implements the Command interface, holding the actual operation.
+* **Invoker:** Holds and executes commands.
+* **Receiver:** Performs the actual work when the command is executed.
+
+## 4. Real-World Analogy
+
+Think of a remote control (Invoker) that sends commands (Command) to a TV (Receiver). Each button press is a command that tells the TV what to do (like turning it on, changing the channel, etc.).
+
+## 5. Full Code Example
 
 ```csharp
+using System;
+using System.Collections.Generic;
+
+// Command Interface
 public interface ICommand
 {
     void Execute();
 }
 
-public class LightOnCommand : ICommand
+// Receiver
+public class Light
 {
-    public void Execute() => Console.WriteLine("Light is turned on.");
+    public void TurnOn()
+    {
+        Console.WriteLine("Light is ON.");
+    }
+
+    public void TurnOff()
+    {
+        Console.WriteLine("Light is OFF.");
+    }
+}
+
+// Concrete Command - Turn On Command
+public class TurnOnCommand : ICommand
+{
+    private Light _light;
+
+    public TurnOnCommand(Light light)
+    {
+        _light = light;
+    }
+
+    public void Execute()
+    {
+        _light.TurnOn();
+    }
+}
+
+// Concrete Command - Turn Off Command
+public class TurnOffCommand : ICommand
+{
+    private Light _light;
+
+    public TurnOffCommand(Light light)
+    {
+        _light = light;
+    }
+
+    public void Execute()
+    {
+        _light.TurnOff();
+    }
+}
+
+// Invoker
+public class RemoteControl
+{
+    private List<ICommand> _commands = new List<ICommand>();
+
+    public void AddCommand(ICommand command)
+    {
+        _commands.Add(command);
+    }
+
+    public void ExecuteCommands()
+    {
+        foreach (var command in _commands)
+        {
+            command.Execute();
+        }
+    }
+}
+
+// Client Code
+class Program
+{
+    static void Main()
+    {
+        Light livingRoomLight = new Light();
+
+        ICommand turnOn = new TurnOnCommand(livingRoomLight);
+        ICommand turnOff = new TurnOffCommand(livingRoomLight);
+
+        RemoteControl remote = new RemoteControl();
+        remote.AddCommand(turnOn);
+        remote.AddCommand(turnOff);
+
+        Console.WriteLine("--- Executing Commands ---");
+        remote.ExecuteCommands();
+    }
 }
 ```
 
-## 15. Interpreter Pattern
+## 6. Benefits
 
-* **Definition:** Defines a representation for a language grammar and an interpreter to evaluate it.
-* **When to Use:** Use when you need to implement a language interpreter.
-* **Similar Patterns to Learn:** Visitor, Command.
+* Decouples sender and receiver.
+* Supports command queuing, logging, and undo/redo operations.
+* Makes it easy to add new commands without modifying existing code.
+
+## 7. Similar Patterns to Learn
+
+* **Chain of Responsibility Pattern:** Passes a request along a chain of handlers.
+* **Mediator Pattern:** Manages communication between multiple objects.
+* **Strategy Pattern:** Defines a family of algorithms and makes them interchangeable.
+
+## 8. Common Mistakes
+
+* Making the Command classes too complex, violating Single Responsibility Principle.
+* Creating too many command classes for simple operations.
+* Forgetting to properly decouple the Command from the Receiver.
+
+## 9. 10 Interview Questions with Detailed Answers
+
+1. **What is the Command Pattern?**
+
+   * Answer: A behavioral pattern that encapsulates a request as an object, decoupling the sender and receiver.
+
+2. **When should you use the Command Pattern?**
+
+   * Answer: When you need to queue, log, or undo/redo commands.
+
+3. **What are the main components of this pattern?**
+
+   * Answer: Command Interface, Concrete Command, Invoker, Receiver.
+
+4. **How does it differ from the Strategy Pattern?**
+
+   * Answer: Strategy focuses on choosing algorithms, while Command focuses on encapsulating requests.
+
+5. **What is the role of the Receiver?**
+
+   * Answer: The Receiver performs the actual work of the command.
+
+6. **How do you implement undo/redo in Command Pattern?**
+
+   * Answer: By storing the command history and executing the inverse of the command.
+
+7. **What are some real-world examples of Command Pattern?**
+
+   * Answer: Remote controls, menu options in applications, task queues.
+
+8. **How do you avoid making the Command classes too complex?**
+
+   * Answer: Keep each Command class focused on a single responsibility.
+
+9. **Can Command Pattern be used for logging operations?**
+
+   * Answer: Yes, each Command can log its execution details.
+
+10. **How does the Command Pattern support Open/Closed Principle?**
+
+    * Answer: You can add new commands without modifying existing code.
+
+
+## 15. Interpreter Pattern in C\#
+
+## 1. Definition
+
+The Interpreter Pattern is a behavioral design pattern that defines a representation of a language's grammar and uses an interpreter to evaluate sentences in that language. It is used to interpret and evaluate expressions within a specific domain.
+
+## 2. When to Use
+
+* When you need to evaluate language expressions or instructions.
+* When you want to build a parser for a simple language or notation.
+* When you need to interpret user-defined scripts, commands, or configuration files.
+
+## 3. Key Components
+
+* **Abstract Expression:** Declares the `Interpret` method for all expressions.
+* **Terminal Expression:** Represents a simple, atomic expression in the language.
+* **Non-Terminal Expression:** Represents a complex expression composed of other expressions.
+* **Context:** Contains information that is global to the interpreter.
+
+## 4. Real-World Analogy
+
+Imagine a basic calculator that can parse and evaluate mathematical expressions like "3 + 5" or "10 - 2". Each number is a Terminal Expression, while operators like '+' or '-' are Non-Terminal Expressions that perform actions.
+
+## 5. Full Code Example
 
 ```csharp
+using System;
+using System.Collections.Generic;
+
+// Abstract Expression
 public interface IExpression
 {
-    int Interpret();
+    int Interpret(Dictionary<string, int> context);
 }
 
+// Terminal Expression
 public class NumberExpression : IExpression
 {
-    private readonly int _number;
+    private int _number;
 
     public NumberExpression(int number)
     {
         _number = number;
     }
 
-    public int Interpret() => _number;
+    public int Interpret(Dictionary<string, int> context)
+    {
+        return _number;
+    }
+}
+
+// Non-Terminal Expression (Addition)
+public class AdditionExpression : IExpression
+{
+    private IExpression _leftExpression;
+    private IExpression _rightExpression;
+
+    public AdditionExpression(IExpression left, IExpression right)
+    {
+        _leftExpression = left;
+        _rightExpression = right;
+    }
+
+    public int Interpret(Dictionary<string, int> context)
+    {
+        return _leftExpression.Interpret(context) + _rightExpression.Interpret(context);
+    }
+}
+
+// Non-Terminal Expression (Subtraction)
+public class SubtractionExpression : IExpression
+{
+    private IExpression _leftExpression;
+    private IExpression _rightExpression;
+
+    public SubtractionExpression(IExpression left, IExpression right)
+    {
+        _leftExpression = left;
+        _rightExpression = right;
+    }
+
+    public int Interpret(Dictionary<string, int> context)
+    {
+        return _leftExpression.Interpret(context) - _rightExpression.Interpret(context);
+    }
+}
+
+// Client Code
+class Program
+{
+    static void Main()
+    {
+        // Context: no variables used
+        Dictionary<string, int> context = new Dictionary<string, int>();
+
+        // 5 + 3 - 2
+        IExpression expression = new SubtractionExpression(
+            new AdditionExpression(new NumberExpression(5), new NumberExpression(3)),
+            new NumberExpression(2)
+        );
+
+        Console.WriteLine("Result: " + expression.Interpret(context));
+    }
 }
 ```
-# Design Patterns 16-20: Full Details with Code
+
+## 6. Benefits
+
+* Simplifies the creation of a language parser.
+* Makes it easy to extend the language by adding new expressions.
+* Decouples the syntax of a language from its evaluation logic.
+
+## 7. Similar Patterns to Learn
+
+* **Composite Pattern:** Structures expressions in a tree-like form.
+* **Strategy Pattern:** Defines interchangeable algorithms, similar to expressions.
+* **Visitor Pattern:** Provides a way to add operations to complex objects without modifying them.
+
+## 8. Common Mistakes
+
+* Overusing the pattern for complex languages, making the structure hard to maintain.
+* Creating too many classes for simple expressions.
+* Confusing Terminal and Non-Terminal expressions.
+
+## 9. 10 Interview Questions with Detailed Answers
+
+1. **What is the Interpreter Pattern?**
+
+   * Answer: A behavioral pattern that defines a representation of a language and provides an interpreter to evaluate its sentences.
+
+2. **When should you use the Interpreter Pattern?**
+
+   * Answer: When you need to evaluate expressions in a simple language or notation.
+
+3. **What are the key components of this pattern?**
+
+   * Answer: Abstract Expression, Terminal Expression, Non-Terminal Expression, Context.
+
+4. **How does it differ from Composite Pattern?**
+
+   * Answer: Interpreter uses tree structure for language parsing, while Composite uses tree structure for hierarchies.
+
+5. **Can you give a real-world example?**
+
+   * Answer: A basic calculator that can evaluate expressions like "3 + 5 - 2".
+
+6. **What is the role of Terminal and Non-Terminal Expressions?**
+
+   * Answer: Terminal represents atomic expressions, Non-Terminal represents complex expressions.
+
+7. **How do you extend the language using this pattern?**
+
+   * Answer: By adding new Terminal or Non-Terminal expressions.
+
+8. **What is the role of the Context?**
+
+   * Answer: It stores global information needed by the interpreter.
+
+9. **What is a potential drawback of using this pattern?**
+
+   * Answer: Can become complex with too many classes for a rich language.
+
+10. **How does this pattern support the Open/Closed Principle?**
+
+    * Answer: You can add new expression types without modifying existing code.
+
 
 ## 16. Mediator Pattern
 
