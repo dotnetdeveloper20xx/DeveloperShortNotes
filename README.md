@@ -6241,4 +6241,844 @@ class CircularLinkedList
 * ✅ Use for circular data structures (round-robin, task scheduling).
 * ❌ Avoid for complex data navigation.
 
+## 6. Hashing (Dictionaries and HashSets)
+
+### Understanding Hashing
+
+* **Definition:** Hashing is a technique used to uniquely identify a specific object from a collection using a hash function.
+* **Hash Function:** Converts input data into a fixed-size numeric hash value.
+
+### Why Use Hashing?
+
+* Fast data access (O(1) average time).
+* Efficient for lookups, insertions, and deletions.
+
+### Hash Tables vs HashSets
+
+* **Hash Table:** Stores key-value pairs (Dictionary).
+* **Hash Set:** Stores unique values without duplicates.
+
+---
+
+### 6.1 Dictionary (Hash Table)
+
+### C# Code Example (Dictionary)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Dictionary Example
+        Dictionary<string, int> phoneBook = new Dictionary<string, int>();
+
+        // Adding Key-Value Pairs
+        phoneBook.Add("Alice", 12345);
+        phoneBook.Add("Bob", 67890);
+
+        // Accessing Values
+        Console.WriteLine("Alice's Number: " + phoneBook["Alice"]);
+
+        // Checking Key Existence
+        if (phoneBook.ContainsKey("Bob"))
+        {
+            Console.WriteLine("Bob's Number: " + phoneBook["Bob"]);
+        }
+
+        // Iterating through Dictionary
+        Console.WriteLine("All Entries:");
+        foreach (var entry in phoneBook)
+        {
+            Console.WriteLine(entry.Key + " - " + entry.Value);
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Alice's Number: 12345
+Bob's Number: 67890
+All Entries:
+Alice - 12345
+Bob - 67890
+```
+
+### When to Use Dictionaries:
+
+* ✅ Use for fast key-value lookups.
+* ❌ Avoid for sorted data (use SortedDictionary).
+
+---
+
+### 6.2 HashSet
+
+### C# Code Example (HashSet)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // HashSet Example
+        HashSet<int> uniqueNumbers = new HashSet<int>();
+
+        // Adding Elements
+        uniqueNumbers.Add(1);
+        uniqueNumbers.Add(2);
+        uniqueNumbers.Add(3);
+
+        // Attempting to Add Duplicates
+        uniqueNumbers.Add(2);
+
+        // Displaying HashSet
+        Console.WriteLine("Unique Numbers:");
+        foreach (var num in uniqueNumbers)
+        {
+            Console.WriteLine(num);
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Unique Numbers:
+1
+2
+3
+```
+
+### When to Use HashSets:
+
+* ✅ Use for fast lookups of unique values.
+* ❌ Avoid for duplicate values or sorted data.
+
+---
+
+### Hash Tables vs Hash Sets Comparison Table
+
+| Aspect     | Dictionary (Hash Table)    | HashSet                    |
+| ---------- | -------------------------- | -------------------------- |
+| Storage    | Key-Value Pairs            | Unique Values              |
+| Duplicates | Keys must be unique        | No Duplicates              |
+| Use Case   | Phone Book, Product Prices | Unique Elements Collection |
+| Access     | O(1) Average Time          | O(1) Average Time          |
+
+### Watchouts (Do's and Don'ts)
+
+* ✅ Prefer Dictionary for key-value pairs.
+* ✅ Use HashSet for fast lookups of unique values.
+* ❌ Don’t use HashSet for maintaining duplicate values.
+
+## 7. Trees (Binary, Binary Search Tree, AVL, Red-Black)
+
+### Understanding Trees
+
+* **Definition:** Trees are hierarchical data structures consisting of nodes, with a root node at the top and child nodes branching out.
+* **Key Concepts:**
+
+  * **Root:** The top node of the tree.
+  * **Node:** Each element in the tree.
+  * **Leaf:** A node without children.
+  * **Parent and Child:** Nodes connected by a branch.
+
+### Types of Trees
+
+1. **Binary Tree:** Each node has at most two children (left and right).
+2. **Binary Search Tree (BST):** A Binary Tree with an ordering rule:
+
+   * Left Child < Parent
+   * Right Child > Parent
+3. **AVL Tree:** A self-balancing BST where the height difference between left and right subtrees is at most 1.
+4. **Red-Black Tree:** A self-balancing BST with color properties for balancing.
+
+---
+
+### 7.1 Binary Tree
+
+### C# Code Example (Binary Tree)
+
+```csharp
+using System;
+
+class TreeNode
+{
+    public int Value;
+    public TreeNode Left;
+    public TreeNode Right;
+
+    public TreeNode(int value)
+    {
+        Value = value;
+        Left = null;
+        Right = null;
+    }
+}
+
+class BinaryTree
+{
+    public TreeNode Root;
+
+    // Add Node
+    public void Add(int value)
+    {
+        Root = AddRecursive(Root, value);
+    }
+
+    private TreeNode AddRecursive(TreeNode node, int value)
+    {
+        if (node == null) return new TreeNode(value);
+
+        if (value < node.Value)
+            node.Left = AddRecursive(node.Left, value);
+        else if (value > node.Value)
+            node.Right = AddRecursive(node.Right, value);
+
+        return node;
+    }
+
+    // Display In-Order
+    public void DisplayInOrder(TreeNode node)
+    {
+        if (node == null) return;
+
+        DisplayInOrder(node.Left);
+        Console.Write(node.Value + " ");
+        DisplayInOrder(node.Right);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        BinaryTree tree = new BinaryTree();
+        tree.Add(50);
+        tree.Add(30);
+        tree.Add(70);
+        tree.Add(20);
+        tree.Add(40);
+        tree.Add(60);
+        tree.Add(80);
+
+        Console.WriteLine("In-Order Traversal:");
+        tree.DisplayInOrder(tree.Root);
+    }
+}
+```
+
+### Output:
+
+```
+In-Order Traversal:
+20 30 40 50 60 70 80
+```
+
+### When to Use Binary Trees:
+
+* ✅ Use for hierarchical data (file systems, organization charts).
+* ❌ Avoid for fast random access (use Arrays).
+
+---
+
+### 7.2 Binary Search Tree (BST)
+
+* Same structure as Binary Tree with a sorting rule:
+
+  * Left Child < Parent
+  * Right Child > Parent
+
+### Advantages of BST:
+
+* Fast search (O(log n) average).
+* Sorted data structure.
+
+### Drawbacks:
+
+* Can become unbalanced (skewed).
+
+### C# Code Example (Binary Search Tree)
+
+* The above Binary Tree code is already a Binary Search Tree.
+
+---
+
+### 7.3 AVL Tree
+
+* A self-balancing BST with height difference check.
+* Rebalances itself on insertions and deletions.
+
+### Key Properties:
+
+* Height difference between left and right subtrees is at most 1.
+* Automatically balances itself.
+
+### When to Use AVL Trees:
+
+* ✅ Use for high-performance searching with balanced structure.
+* ❌ Avoid for high insertion/deletion rates (slightly slower).
+
+---
+
+### 7.4 Red-Black Tree
+
+* Another self-balancing BST with color properties:
+
+  * Each node is either Red or Black.
+  * Root is always Black.
+  * Red nodes cannot have Red children.
+
+### Key Benefits:
+
+* Faster balancing than AVL Trees.
+
+### When to Use Red-Black Trees:
+
+* ✅ Use for general-purpose balanced tree structures.
+* ❌ Avoid for strict height balancing (use AVL).
+
+### Trees Comparison Table
+
+| Tree Type          | Self-Balancing | Use Case                               | Average Search |
+| ------------------ | -------------- | -------------------------------------- | -------------- |
+| Binary Tree        | ❌              | General hierarchical data              | O(n)           |
+| Binary Search Tree | ❌              | Sorted data, fast search               | O(log n)       |
+| AVL Tree           | ✅              | Strictly balanced, fast search         | O(log n)       |
+| Red-Black Tree     | ✅              | General balanced tree (faster inserts) | O(log n)       |
+
+
+## 8. Heaps and Priority Queues
+
+### Understanding Heaps
+
+* **Definition:** A Heap is a specialized Tree-based data structure that satisfies the **Heap Property**:
+
+  * **Min-Heap:** Parent nodes are smaller than their children.
+  * **Max-Heap:** Parent nodes are larger than their children.
+* **Use Cases:** Priority Queue, Scheduling, Pathfinding (Dijkstra's Algorithm).
+
+### Key Characteristics:
+
+* Complete Binary Tree (all levels are filled except the last, which is filled from left to right).
+* Efficient insertion and deletion (O(log n)).
+
+---
+
+### 8.1 Min-Heap (Priority Queue)
+
+### C# Code Example (Min-Heap using PriorityQueue)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Min-Heap using PriorityQueue
+        PriorityQueue<int, int> minHeap = new PriorityQueue<int, int>();
+
+        // Adding Elements
+        minHeap.Enqueue(5, 5);
+        minHeap.Enqueue(2, 2);
+        minHeap.Enqueue(8, 8);
+        minHeap.Enqueue(1, 1);
+
+        Console.WriteLine("Min-Heap Elements:");
+        while (minHeap.Count > 0)
+        {
+            Console.WriteLine(minHeap.Dequeue());
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Min-Heap Elements:
+1
+2
+5
+8
+```
+
+### When to Use Min-Heap:
+
+* ✅ Use for scheduling (task priority).
+* ✅ Use for pathfinding algorithms (Dijkstra).
+
+---
+
+### 8.2 Max-Heap
+
+### C# Code Example (Max-Heap using PriorityQueue)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // Max-Heap using custom comparer (negative priority)
+        PriorityQueue<int, int> maxHeap = new PriorityQueue<int, int>(Comparer<int>.Create((a, b) => b - a));
+
+        // Adding Elements
+        maxHeap.Enqueue(5, 5);
+        maxHeap.Enqueue(2, 2);
+        maxHeap.Enqueue(8, 8);
+        maxHeap.Enqueue(1, 1);
+
+        Console.WriteLine("Max-Heap Elements:");
+        while (maxHeap.Count > 0)
+        {
+            Console.WriteLine(maxHeap.Dequeue());
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Max-Heap Elements:
+8
+5
+2
+1
+```
+
+### When to Use Max-Heap:
+
+* ✅ Use for highest priority tasks.
+* ✅ Use for game leaderboards, data ranking.
+
+---
+
+### 8.3 Heaps vs Priority Queues
+
+| Aspect    | Heap (Tree)                 | Priority Queue (Abstract Data Type) |
+| --------- | --------------------------- | ----------------------------------- |
+| Structure | Complete Binary Tree        | Abstract Queue (Heap-based)         |
+| Order     | Min-Heap (Smallest at Root) | Min or Max based on priority        |
+| Use Case  | Efficient sorting, Dijkstra | Scheduling, Task Management         |
+
+### Watchouts (Do's and Don'ts)
+
+* ✅ Use Min-Heap for shortest path algorithms (Dijkstra).
+* ✅ Use Max-Heap for highest priority tasks.
+* ❌ Don’t use Heaps for general-purpose data storage.
+
+## 9. Graphs (DFS, BFS, Dijkstra's Algorithm)
+
+### Understanding Graphs
+
+* **Definition:** A Graph is a collection of nodes (vertices) connected by edges.
+* **Types of Graphs:**
+
+  * **Directed Graph:** Edges have a direction (one-way).
+  * **Undirected Graph:** Edges are bidirectional.
+  * **Weighted Graph:** Edges have weights (costs).
+  * **Unweighted Graph:** Edges have no weights.
+
+### Key Terminology:
+
+* **Vertex (Node):** A point in the graph.
+* **Edge:** A connection between two vertices.
+* **Path:** A sequence of vertices connected by edges.
+* **Cycle:** A path that starts and ends at the same vertex.
+
+---
+
+### 9.1 Depth-First Search (DFS)
+
+### C# Code Example (DFS)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Graph
+{
+    private Dictionary<int, List<int>> adjacencyList = new Dictionary<int, List<int>>();
+
+    // Add Edge (Undirected)
+    public void AddEdge(int u, int v)
+    {
+        if (!adjacencyList.ContainsKey(u))
+            adjacencyList[u] = new List<int>();
+
+        if (!adjacencyList.ContainsKey(v))
+            adjacencyList[v] = new List<int>();
+
+        adjacencyList[u].Add(v);
+        adjacencyList[v].Add(u);
+    }
+
+    // Depth-First Search
+    public void DFS(int start)
+    {
+        HashSet<int> visited = new HashSet<int>();
+        DFSRecursive(start, visited);
+    }
+
+    private void DFSRecursive(int vertex, HashSet<int> visited)
+    {
+        visited.Add(vertex);
+        Console.Write(vertex + " ");
+
+        foreach (var neighbor in adjacencyList[vertex])
+        {
+            if (!visited.Contains(neighbor))
+                DFSRecursive(neighbor, visited);
+        }
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Graph graph = new Graph();
+        graph.AddEdge(1, 2);
+        graph.AddEdge(1, 3);
+        graph.AddEdge(2, 4);
+        graph.AddEdge(3, 5);
+
+        Console.WriteLine("DFS Traversal:");
+        graph.DFS(1);
+    }
+}
+```
+
+### Output:
+
+```
+DFS Traversal:
+1 2 4 3 5
+```
+
+### When to Use DFS:
+
+* ✅ Use for exploring all connected nodes (Maze Solving, Tree Traversal).
+* ❌ Avoid for shortest path problems (use BFS or Dijkstra).
+
+---
+
+### 9.2 Breadth-First Search (BFS)
+
+### C# Code Example (BFS)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Graph
+{
+    private Dictionary<int, List<int>> adjacencyList = new Dictionary<int, List<int>>();
+
+    // Add Edge
+    public void AddEdge(int u, int v)
+    {
+        if (!adjacencyList.ContainsKey(u))
+            adjacencyList[u] = new List<int>();
+
+        if (!adjacencyList.ContainsKey(v))
+            adjacencyList[v] = new List<int>();
+
+        adjacencyList[u].Add(v);
+        adjacencyList[v].Add(u);
+    }
+
+    // Breadth-First Search
+    public void BFS(int start)
+    {
+        Queue<int> queue = new Queue<int>();
+        HashSet<int> visited = new HashSet<int>();
+
+        queue.Enqueue(start);
+        visited.Add(start);
+
+        while (queue.Count > 0)
+        {
+            int node = queue.Dequeue();
+            Console.Write(node + " ");
+
+            foreach (var neighbor in adjacencyList[node])
+            {
+                if (!visited.Contains(neighbor))
+                {
+                    visited.Add(neighbor);
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+    }
+}
+```
+
+### Output:
+
+```
+BFS Traversal:
+1 2 3 4 5
+```
+
+### When to Use BFS:
+
+* ✅ Use for shortest path in unweighted graphs.
+* ✅ Use for level-order traversal (tree levels).
+
+---
+
+### 9.3 Dijkstra's Algorithm
+
+### C# Code Example (Dijkstra)
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+class Graph
+{
+    private Dictionary<int, List<(int, int)>> adjacencyList = new Dictionary<int, List<(int, int)>>();
+
+    // Add Weighted Edge
+    public void AddEdge(int u, int v, int weight)
+    {
+        if (!adjacencyList.ContainsKey(u))
+            adjacencyList[u] = new List<(int, int)>();
+
+        adjacencyList[u].Add((v, weight));
+    }
+
+    // Dijkstra's Algorithm
+    public void Dijkstra(int start)
+    {
+        Dictionary<int, int> distances = new Dictionary<int, int>();
+        foreach (var vertex in adjacencyList.Keys)
+            distances[vertex] = int.MaxValue;
+
+        distances[start] = 0;
+        PriorityQueue<int, int> pq = new PriorityQueue<int, int>();
+        pq.Enqueue(start, 0);
+
+        while (pq.Count > 0)
+        {
+            int current = pq.Dequeue();
+
+            foreach (var (neighbor, weight) in adjacencyList[current])
+            {
+                int newDist = distances[current] + weight;
+
+                if (newDist < distances[neighbor])
+                {
+                    distances[neighbor] = newDist;
+                    pq.Enqueue(neighbor, newDist);
+                }
+            }
+        }
+
+        Console.WriteLine("Shortest Distances:");
+        foreach (var kvp in distances)
+            Console.WriteLine($"Node {kvp.Key}: {kvp.Value}");
+    }
+}
+```
+
+### When to Use Dijkstra:
+
+* ✅ Use for shortest path in weighted graphs.
+* ❌ Avoid for graphs with negative weights (use Bellman-Ford).
+
+## 10. Sorting Algorithms
+
+### Understanding Sorting Algorithms
+
+* **Definition:** Sorting is the process of arranging elements in a specific order (ascending or descending).
+* **Types of Sorting Algorithms:**
+
+  * **Bubble Sort:** Simple but inefficient (O(n^2)).
+  * **Selection Sort:** Simple but slow (O(n^2)).
+  * **Insertion Sort:** Efficient for small or nearly sorted data (O(n^2)).
+  * **Merge Sort:** Efficient, divide-and-conquer (O(n log n)).
+  * **Quick Sort:** Fast, divide-and-conquer (O(n log n) average).
+  * **Heap Sort:** Uses Heap data structure (O(n log n)).
+
+### 10.1 Bubble Sort
+
+### C# Code Example (Bubble Sort)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 5, 3, 8, 4, 2 };
+        BubbleSort(numbers);
+
+        Console.WriteLine("Sorted Array:");
+        foreach (var num in numbers)
+        {
+            Console.Write(num + " ");
+        }
+    }
+
+    static void BubbleSort(int[] array)
+    {
+        for (int i = 0; i < array.Length - 1; i++)
+        {
+            for (int j = 0; j < array.Length - i - 1; j++)
+            {
+                if (array[j] > array[j + 1])
+                {
+                    // Swap
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                }
+            }
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Sorted Array:
+2 3 4 5 8
+```
+
+### When to Use Bubble Sort:
+
+* ✅ Use for educational purposes.
+* ❌ Avoid for large datasets (inefficient).
+
+---
+
+### 10.2 Selection Sort
+
+### C# Code Example (Selection Sort)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 5, 3, 8, 4, 2 };
+        SelectionSort(numbers);
+
+        Console.WriteLine("Sorted Array:");
+        foreach (var num in numbers)
+        {
+            Console.Write(num + " ");
+        }
+    }
+
+    static void SelectionSort(int[] array)
+    {
+        for (int i = 0; i < array.Length - 1; i++)
+        {
+            int minIndex = i;
+            for (int j = i + 1; j < array.Length; j++)
+            {
+                if (array[j] < array[minIndex])
+                {
+                    minIndex = j;
+                }
+            }
+
+            // Swap
+            int temp = array[minIndex];
+            array[minIndex] = array[i];
+            array[i] = temp;
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Sorted Array:
+2 3 4 5 8
+```
+
+### When to Use Selection Sort:
+
+* ✅ Use for small datasets.
+* ❌ Avoid for large datasets (inefficient).
+
+---
+
+### 10.3 Insertion Sort
+
+### C# Code Example (Insertion Sort)
+
+```csharp
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        int[] numbers = { 5, 3, 8, 4, 2 };
+        InsertionSort(numbers);
+
+        Console.WriteLine("Sorted Array:");
+        foreach (var num in numbers)
+        {
+            Console.Write(num + " ");
+        }
+    }
+
+    static void InsertionSort(int[] array)
+    {
+        for (int i = 1; i < array.Length; i++)
+        {
+            int key = array[i];
+            int j = i - 1;
+
+            while (j >= 0 && array[j] > key)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+            array[j + 1] = key;
+        }
+    }
+}
+```
+
+### Output:
+
+```
+Sorted Array:
+2 3 4 5 8
+```
+
+### When to Use Insertion Sort:
+
+* ✅ Use for small or nearly sorted datasets.
+* ❌ Avoid for large unsorted datasets.
+
+
+
 
