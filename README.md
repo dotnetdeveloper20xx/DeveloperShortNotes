@@ -662,4 +662,261 @@ public class Facade
     }
 }
 ```
+# Design Patterns 7-15: Full Details with Code
+
+## 7. Bridge Pattern
+
+* **Definition:** Separates an abstraction from its implementation so that they can vary independently.
+* **When to Use:** Use when you want to decouple abstraction and implementation.
+* **Similar Patterns to Learn:** Adapter, Composite.
+
+```csharp
+public interface IRenderer
+{
+    void RenderShape(string shape);
+}
+
+public class VectorRenderer : IRenderer
+{
+    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with vectors");
+}
+
+public class RasterRenderer : IRenderer
+{
+    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with pixels");
+}
+
+public class Shape
+{
+    protected IRenderer renderer;
+
+    public Shape(IRenderer renderer)
+    {
+        this.renderer = renderer;
+    }
+}
+
+public class Circle : Shape
+{
+    public Circle(IRenderer renderer) : base(renderer) { }
+
+    public void Draw() => renderer.RenderShape("Circle");
+}
+```
+
+## 8. Composite Pattern
+
+* **Definition:** Composes objects into tree structures to represent part-whole hierarchies.
+* **When to Use:** Use when you need to work with tree-like structures.
+* **Similar Patterns to Learn:** Decorator, Flyweight.
+
+```csharp
+public interface IComponent
+{
+    void Display();
+}
+
+public class Leaf : IComponent
+{
+    public void Display() => Console.WriteLine("Leaf");
+}
+
+public class Composite : IComponent
+{
+    private readonly List<IComponent> _children = new List<IComponent>();
+
+    public void Add(IComponent component) => _children.Add(component);
+
+    public void Display()
+    {
+        Console.WriteLine("Composite");
+        foreach (var child in _children) child.Display();
+    }
+}
+```
+
+## 9. Decorator Pattern
+
+* **Definition:** Adds responsibilities to an object dynamically.
+* **When to Use:** Use when you need to add features to an object without modifying its class.
+* **Similar Patterns to Learn:** Proxy, Composite.
+
+```csharp
+public interface ICoffee
+{
+    string GetDescription();
+}
+
+public class BasicCoffee : ICoffee
+{
+    public string GetDescription() => "Basic Coffee";
+}
+
+public class MilkDecorator : ICoffee
+{
+    private readonly ICoffee _coffee;
+
+    public MilkDecorator(ICoffee coffee)
+    {
+        _coffee = coffee;
+    }
+
+    public string GetDescription() => _coffee.GetDescription() + ", Milk";
+}
+```
+
+## 10. Facade Pattern
+
+* **Definition:** Provides a unified interface to a set of interfaces in a subsystem.
+* **When to Use:** Use when you want to simplify complex subsystems.
+* **Similar Patterns to Learn:** Mediator, Adapter.
+
+```csharp
+public class SubsystemA
+{
+    public void OperationA() => Console.WriteLine("Subsystem A operation");
+}
+
+public class SubsystemB
+{
+    public void OperationB() => Console.WriteLine("Subsystem B operation");
+}
+
+public class Facade
+{
+    private readonly SubsystemA _subsystemA = new SubsystemA();
+    private readonly SubsystemB _subsystemB = new SubsystemB();
+
+    public void PerformOperations()
+    {
+        _subsystemA.OperationA();
+        _subsystemB.OperationB();
+    }
+}
+```
+
+## 11. Flyweight Pattern
+
+* **Definition:** Reduces memory usage by sharing common state among multiple objects.
+* **When to Use:** Use when you need to create a large number of similar objects.
+* **Similar Patterns to Learn:** Singleton, Prototype.
+
+```csharp
+public class Character
+{
+    public char Symbol { get; set; }
+    public string Font { get; set; }
+}
+
+public class CharacterFactory
+{
+    private readonly Dictionary<char, Character> _characters = new();
+
+    public Character GetCharacter(char symbol)
+    {
+        if (!_characters.ContainsKey(symbol))
+        {
+            _characters[symbol] = new Character { Symbol = symbol };
+        }
+        return _characters[symbol];
+    }
+}
+```
+
+## 12. Proxy Pattern
+
+* **Definition:** Provides a surrogate or placeholder for another object to control access.
+* **When to Use:** Use when you need to control access to an object.
+* **Similar Patterns to Learn:** Decorator, Adapter.
+
+```csharp
+public interface IService
+{
+    void Execute();
+}
+
+public class RealService : IService
+{
+    public void Execute() => Console.WriteLine("Real service executed.");
+}
+
+public class ProxyService : IService
+{
+    private readonly RealService _realService = new();
+
+    public void Execute()
+    {
+        Console.WriteLine("Proxy controlling access.");
+        _realService.Execute();
+    }
+}
+```
+
+## 13. Chain of Responsibility Pattern
+
+* **Definition:** Passes a request along a chain of handlers.
+* **When to Use:** Use when you have multiple handlers for a request.
+* **Similar Patterns to Learn:** Command, Mediator.
+
+```csharp
+public abstract class Handler
+{
+    protected Handler Next;
+
+    public void SetNext(Handler next) => Next = next;
+    public abstract void HandleRequest(string request);
+}
+
+public class AuthHandler : Handler
+{
+    public override void HandleRequest(string request)
+    {
+        Console.WriteLine("Authenticating request.");
+        Next?.HandleRequest(request);
+    }
+}
+```
+
+## 14. Command Pattern
+
+* **Definition:** Encapsulates a request as an object.
+* **When to Use:** Use when you need to parameterize objects with actions.
+* **Similar Patterns to Learn:** Chain of Responsibility, Mediator.
+
+```csharp
+public interface ICommand
+{
+    void Execute();
+}
+
+public class LightOnCommand : ICommand
+{
+    public void Execute() => Console.WriteLine("Light is turned on.");
+}
+```
+
+## 15. Interpreter Pattern
+
+* **Definition:** Defines a representation for a language grammar and an interpreter to evaluate it.
+* **When to Use:** Use when you need to implement a language interpreter.
+* **Similar Patterns to Learn:** Visitor, Command.
+
+```csharp
+public interface IExpression
+{
+    int Interpret();
+}
+
+public class NumberExpression : IExpression
+{
+    private readonly int _number;
+
+    public NumberExpression(int number)
+    {
+        _number = number;
+    }
+
+    public int Interpret() => _number;
+}
+```
 
