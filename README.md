@@ -459,369 +459,1175 @@ public class MacOSFactory : IGUIFactory
 
 ### 4. Builder Pattern
 
-* **Definition:** Separates the construction of a complex object from its representation.
-* **When to Use:** Use when you need to create a complex object step by step.
-* **Similar Patterns to Learn:** Factory Method, Prototype.
+## Definition
+
+* **Builder Pattern** is a creational design pattern that separates the construction of a complex object from its representation.
+* It allows you to create a complex object step by step, giving you more control over the creation process.
+
+## When to Use
+
+* When the creation of an object is complex and involves multiple steps.
+* When you want to construct different representations of the same complex object.
+* When you want to ensure that the object creation process is clear and maintainable.
+
+## Key Components
+
+* **Builder Interface:** Defines the methods for building different parts of the product.
+* **Concrete Builder:** Implements the builder interface to construct and assemble parts of the product.
+* **Product:** The final complex object that is created by the builder.
+* **Director:** Manages the construction process using the builder.
+
+## Real-World Analogy
+
+* Think of a "Pizza Builder" in a restaurant. The customer (Director) specifies the ingredients and toppings, while the chef (Concrete Builder) uses these instructions to build the final pizza (Product).
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Product
 
 ```csharp
+// The complex object being built
 public class Computer
 {
     public string CPU { get; set; }
+    public string GPU { get; set; }
     public string RAM { get; set; }
     public string Storage { get; set; }
-}
 
-public class ComputerBuilder
+    public override string ToString()
+    {
+        return $"CPU: {CPU}, GPU: {GPU}, RAM: {RAM}, Storage: {Storage}";
+    }
+}
+```
+
+### Step 2: Create the Builder Interface
+
+```csharp
+// Builder interface specifying the building steps
+public interface IComputerBuilder
+{
+    void SetCPU();
+    void SetGPU();
+    void SetRAM();
+    void SetStorage();
+    Computer GetComputer();
+}
+```
+
+### Step 3: Implement Concrete Builder
+
+```csharp
+// Concrete builder implementing the builder interface
+public class GamingComputerBuilder : IComputerBuilder
 {
     private Computer _computer = new Computer();
 
-    public ComputerBuilder SetCPU(string cpu)
-    {
-        _computer.CPU = cpu;
-        return this;
-    }
+    public void SetCPU() => _computer.CPU = "Intel i9";
+    public void SetGPU() => _computer.GPU = "NVIDIA RTX 4090";
+    public void SetRAM() => _computer.RAM = "32GB DDR5";
+    public void SetStorage() => _computer.Storage = "1TB NVMe SSD";
 
-    public Computer Build() => _computer;
+    public Computer GetComputer() => _computer;
 }
 ```
 
-### 5. Prototype Pattern
-
-* **Definition:** Creates objects by copying an existing object (clone).
-* **When to Use:** Use when object creation is expensive or complex.
-* **Similar Patterns to Learn:** Builder, Abstract Factory.
+### Step 4: Implement the Director
 
 ```csharp
-public class Shape
+// Director manages the building process
+public class ComputerDirector
 {
-    public string Color { get; set; }
+    private readonly IComputerBuilder _builder;
 
-    public Shape Clone()
+    public ComputerDirector(IComputerBuilder builder)
     {
-        return (Shape)this.MemberwiseClone();
+        _builder = builder;
+    }
+
+    public void BuildComputer()
+    {
+        _builder.SetCPU();
+        _builder.SetGPU();
+        _builder.SetRAM();
+        _builder.SetStorage();
+    }
+
+    public Computer GetComputer() => _builder.GetComputer();
+}
+```
+
+### Step 5: Usage
+
+```csharp
+// Example usage of the builder pattern
+var builder = new GamingComputerBuilder();
+var director = new ComputerDirector(builder);
+
+director.BuildComputer();
+var computer = director.GetComputer();
+Console.WriteLine(computer);
+```
+
+### Output
+
+```
+CPU: Intel i9, GPU: NVIDIA RTX 4090, RAM: 32GB DDR5, Storage: 1TB NVMe SSD
+```
+
+## Benefits
+
+* Simplifies object creation with clear steps.
+* Makes the creation process flexible and customizable.
+* Enforces a step-by-step construction process.
+
+## Similar Patterns to Learn
+
+* **Factory Method:** For creating objects without specifying their exact class.
+* **Prototype Pattern:** For creating object clones.
+
+## Common Mistakes (Watchouts)
+
+* Using Builder for simple objects (overkill).
+* Mixing Builder responsibilities with Product responsibilities.
+
+## Interview Questions with Answers
+
+1. **What is the Builder Pattern, and why would you use it?**
+
+   * The Builder Pattern is a creational design pattern that separates the construction of a complex object from its representation. It is used when you need to construct a complex object step by step.
+
+2. **How is the Builder Pattern different from the Factory Method Pattern?**
+
+   * Builder Pattern constructs objects step by step, while Factory Method creates objects in one step without exposing the instantiation logic.
+
+3. **What are the roles of the Director and Builder in the Builder Pattern?**
+
+   * The Director manages the construction process, while the Builder handles the creation of the actual object step by step.
+
+4. **Can the Builder Pattern be used without a Director? Why or why not?**
+
+   * Yes, but it is less organized. The Director centralizes the building process, making it more maintainable.
+
+5. **Give a real-world example where the Builder Pattern is most suitable.**
+
+   * Building a complex object like a Computer, Burger, or Pizza where each item has multiple configurable options.
+
+---
+
+
+### 5. Prototype Pattern in C\#
+
+## Definition
+
+* **Prototype Pattern** is a creational design pattern that allows you to create new objects by copying an existing object (cloning).
+* It helps to avoid the cost of creating an object from scratch.
+
+## When to Use
+
+* When object creation is expensive or complex.
+* When you want to create an object that is a copy of another existing object without modifying it.
+* When you want to avoid a complex initialization process.
+
+## Key Components
+
+* **Prototype Interface:** Declares a cloning method (Clone).
+* **Concrete Prototype:** Implements the cloning method for specific objects.
+
+## Real-World Analogy
+
+* Think of a "Copy Machine" that creates an exact copy of a document. Instead of recreating the document from scratch, you simply make a clone.
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Prototype Interface
+
+```csharp
+// Prototype Interface specifying the Clone method
+public interface IPrototype
+{
+    IPrototype Clone();
+}
+```
+
+### Step 2: Create Concrete Prototype
+
+```csharp
+// Concrete prototype implementing the Clone method
+public class Document : IPrototype
+{
+    public string Title { get; set; }
+    public string Content { get; set; }
+
+    public IPrototype Clone()
+    {
+        return (IPrototype)MemberwiseClone();
+    }
+
+    public override string ToString()
+    {
+        return $"Title: {Title}, Content: {Content}";
     }
 }
 ```
+
+### Step 3: Usage
+
+```csharp
+// Example usage of the prototype pattern
+var originalDocument = new Document { Title = "Design Patterns", Content = "This is a guide on design patterns." };
+var clonedDocument = (Document)originalDocument.Clone();
+
+// Modifying the cloned document
+clonedDocument.Title = "Cloned Document";
+
+Console.WriteLine("Original: " + originalDocument);
+Console.WriteLine("Cloned: " + clonedDocument);
+```
+
+### Output
+
+```
+Original: Title: Design Patterns, Content: This is a guide on design patterns.
+Cloned: Title: Cloned Document, Content: This is a guide on design patterns.
+```
+
+## Benefits
+
+* Reduces the cost of creating complex objects from scratch.
+* Provides flexibility in creating copies without modifying the original object.
+
+## Similar Patterns to Learn
+
+* **Builder Pattern:** For constructing complex objects step by step.
+* **Abstract Factory:** For creating families of related objects.
+
+## Common Mistakes (Watchouts)
+
+* Not implementing deep cloning for complex objects with nested objects.
+* Accidentally modifying the original object when using shallow copy.
+
+## Interview Questions with Answers
+
+1. **What is the Prototype Pattern, and why would you use it?**
+
+   * The Prototype Pattern is a creational design pattern that creates objects by copying an existing object (clone). It is useful when object creation is expensive or complex.
+
+2. **How is the Prototype Pattern different from the Builder Pattern?**
+
+   * Prototype Pattern clones an existing object, while Builder Pattern constructs an object step by step.
+
+3. **What is the difference between shallow and deep cloning?**
+
+   * Shallow cloning copies only the top-level structure, while deep cloning copies all nested objects.
+
+4. **How would you implement deep cloning in the Prototype Pattern?**
+
+   * You would manually create a new instance of each nested object instead of using MemberwiseClone.
+
+5. **Give a real-world example where the Prototype Pattern is most suitable.**
+
+   * Creating copies of complex objects like character templates in a game or copying configuration objects in an application.
+
+---
+
 
 ## Section 2: Structural Patterns
 
-### 6. Adapter Pattern
+### 6. Adapter Pattern in C\#
 
-* **Definition:** Converts the interface of a class into another interface clients expect.
-* **When to Use:** Use when you need to integrate classes with incompatible interfaces.
-* **Similar Patterns to Learn:** Bridge, Proxy.
+## Definition
+
+* **Adapter Pattern** is a structural design pattern that allows two incompatible interfaces to work together.
+* It acts as a bridge between two incompatible interfaces, allowing them to communicate.
+
+## When to Use
+
+* When you want to use an existing class, but its interface is not compatible with the system you are working with.
+* When you need to integrate classes that were not designed to work together.
+
+## Key Components
+
+* **Target Interface:** The interface that clients expect.
+* **Adapter:** Converts the interface of the existing class to match the target interface.
+* **Adaptee:** The existing class that needs to be adapted.
+* **Client:** Uses the adapter to interact with the adaptee through the target interface.
+
+## Real-World Analogy
+
+* Think of an "Electric Socket Adapter." The adapter allows you to plug a device with a different plug type into a socket.
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Target Interface
 
 ```csharp
-public interface ITarget
+// Target Interface - What the client expects
+public interface IAudioPlayer
 {
-    void Request();
+    void Play(string audioType, string fileName);
 }
+```
 
-public class Adaptee
+### Step 2: Create the Adaptee
+
+```csharp
+// Adaptee - Existing incompatible class
+public class VLCPlayer
 {
-    public void SpecificRequest() => Console.WriteLine("Specific Request");
-}
-
-public class Adapter : ITarget
-{
-    private readonly Adaptee _adaptee = new Adaptee();
-
-    public void Request()
+    public void PlayVLC(string fileName)
     {
-        _adaptee.SpecificRequest();
+        Console.WriteLine($"Playing VLC File: {fileName}");
     }
 }
 ```
+
+### Step 3: Implement the Adapter
+
+```csharp
+// Adapter - Converts the interface of VLCPlayer to IAudioPlayer
+public class MediaAdapter : IAudioPlayer
+{
+    private readonly VLCPlayer _vlcPlayer = new VLCPlayer();
+
+    public void Play(string audioType, string fileName)
+    {
+        if (audioType.ToLower() == "vlc")
+        {
+            _vlcPlayer.PlayVLC(fileName);
+        }
+        else
+        {
+            Console.WriteLine("Unsupported format");
+        }
+    }
+}
+```
+
+### Step 4: Create the Client
+
+```csharp
+// Client - Uses the Adapter
+public class AudioPlayer : IAudioPlayer
+{
+    private readonly MediaAdapter _adapter = new MediaAdapter();
+
+    public void Play(string audioType, string fileName)
+    {
+        if (audioType.ToLower() == "vlc")
+        {
+            _adapter.Play(audioType, fileName);
+        }
+        else
+        {
+            Console.WriteLine("Playing MP3 File: " + fileName);
+        }
+    }
+}
+```
+
+### Step 5: Usage
+
+```csharp
+// Example usage of the Adapter Pattern
+var audioPlayer = new AudioPlayer();
+audioPlayer.Play("mp3", "song.mp3");
+audioPlayer.Play("vlc", "video.vlc");
+audioPlayer.Play("mp4", "movie.mp4");
+```
+
+### Output
+
+```
+Playing MP3 File: song.mp3
+Playing VLC File: video.vlc
+Unsupported format
+```
+
+## Benefits
+
+* Allows incompatible interfaces to work together.
+* Provides flexibility for extending existing systems.
+* Promotes code reusability without modifying existing classes.
+
+## Similar Patterns to Learn
+
+* **Bridge Pattern:** Separates an abstraction from its implementation, making them independent.
+* **Proxy Pattern:** Provides a surrogate or placeholder for another object.
+
+## Common Mistakes (Watchouts)
+
+* Making the Adapter too complex, losing simplicity.
+* Misusing Adapter when a simpler solution exists.
+
+## Interview Questions with Answers
+
+1. **What is the Adapter Pattern, and why would you use it?**
+
+   * The Adapter Pattern is a structural design pattern that converts the interface of a class into another interface that clients expect. It is used to integrate incompatible classes.
+
+2. **How is the Adapter Pattern different from the Bridge Pattern?**
+
+   * Adapter makes two incompatible interfaces work together, while Bridge separates an abstraction from its implementation.
+
+3. **What are the components of the Adapter Pattern?**
+
+   * Target Interface, Adapter, Adaptee, and Client.
+
+4. **Can you provide a real-world example of the Adapter Pattern?**
+
+   * An electric socket adapter that allows a device with a different plug type to connect to a socket.
+
+5. **How can you extend the Adapter Pattern to support more formats?**
+
+   * You can enhance the adapter by adding more conditions and support for new formats in the Play method.
+
+---
+
 ## 7. Bridge Pattern
 
-* **Definition:** Separates an abstraction from its implementation so that they can vary independently.
-* **When to Use:** Use when you want to decouple abstraction and implementation.
-* **Similar Patterns to Learn:** Adapter, Composite.
+## Definition
+
+* **Bridge Pattern** is a structural design pattern that separates an abstraction from its implementation so that they can vary independently.
+* It allows you to change the abstraction and the implementation independently without modifying each other.
+
+## When to Use
+
+* When you want to separate an abstraction from its implementation.
+* When you want to avoid a rigid inheritance hierarchy.
+* When you have multiple variations of an abstraction and you want to keep them decoupled.
+
+## Key Components
+
+* **Abstraction:** Defines the interface and maintains a reference to the implementer.
+* **Implementer:** Defines the interface for implementation classes.
+* **Concrete Implementer:** Provides specific implementations of the interface.
+* **Refined Abstraction:** Extends the abstraction to add more functionality.
+
+## Real-World Analogy
+
+* Think of a "Remote Control" (Abstraction) that can work with different devices like TV, Radio, or Projector (Implementer). The remote can vary independently of the device.
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Implementer Interface
 
 ```csharp
-public interface IRenderer
+// Implementer - Defines the interface for devices
+public interface IDevice
 {
-    void RenderShape(string shape);
-}
-
-public class VectorRenderer : IRenderer
-{
-    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with vectors");
-}
-
-public class RasterRenderer : IRenderer
-{
-    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with pixels");
-}
-
-public class Shape
-{
-    protected IRenderer renderer;
-
-    public Shape(IRenderer renderer)
-    {
-        this.renderer = renderer;
-    }
-}
-
-public class Circle : Shape
-{
-    public Circle(IRenderer renderer) : base(renderer) { }
-
-    public void Draw() => renderer.RenderShape("Circle");
+    void TurnOn();
+    void TurnOff();
 }
 ```
+
+### Step 2: Create Concrete Implementers
+
+```csharp
+// Concrete Implementer 1 - TV
+public class TV : IDevice
+{
+    public void TurnOn() => Console.WriteLine("TV is now ON.");
+    public void TurnOff() => Console.WriteLine("TV is now OFF.");
+}
+
+// Concrete Implementer 2 - Radio
+public class Radio : IDevice
+{
+    public void TurnOn() => Console.WriteLine("Radio is now ON.");
+    public void TurnOff() => Console.WriteLine("Radio is now OFF.");
+}
+```
+
+### Step 3: Create the Abstraction
+
+```csharp
+// Abstraction - Remote Control
+public class RemoteControl
+{
+    protected IDevice _device;
+
+    public RemoteControl(IDevice device)
+    {
+        _device = device;
+    }
+
+    public virtual void TogglePower()
+    {
+        Console.WriteLine("Toggling Power...");
+        _device.TurnOn();
+        _device.TurnOff();
+    }
+}
+```
+
+### Step 4: Create Refined Abstraction
+
+```csharp
+// Refined Abstraction - Advanced Remote
+public class AdvancedRemoteControl : RemoteControl
+{
+    public AdvancedRemoteControl(IDevice device) : base(device) { }
+
+    public void Mute()
+    {
+        Console.WriteLine("Muting Device...");
+    }
+}
+```
+
+### Step 5: Usage
+
+```csharp
+// Example usage of the Bridge Pattern
+var tvRemote = new RemoteControl(new TV());
+tvRemote.TogglePower();
+
+var radioRemote = new AdvancedRemoteControl(new Radio());
+radioRemote.TogglePower();
+((AdvancedRemoteControl)radioRemote).Mute();
+```
+
+### Output
+
+```
+Toggling Power...
+TV is now ON.
+TV is now OFF.
+Toggling Power...
+Radio is now ON.
+Radio is now OFF.
+Muting Device...
+```
+
+## Benefits
+
+* Decouples abstraction and implementation, making them independent.
+* Allows you to change implementations without modifying abstractions.
+* Makes code more flexible and scalable.
+
+## Similar Patterns to Learn
+
+* **Adapter Pattern:** Integrates incompatible interfaces.
+* **Composite Pattern:** Composes objects into tree structures to represent part-whole hierarchies.
+
+## Common Mistakes (Watchouts)
+
+* Overengineering: Using Bridge Pattern when a simple class hierarchy is sufficient.
+* Confusing Bridge Pattern with Adapter Pattern.
+
+## Interview Questions with Answers
+
+1. **What is the Bridge Pattern, and why would you use it?**
+
+   * The Bridge Pattern is a structural design pattern that separates an abstraction from its implementation. It is used to decouple abstraction and implementation, making them independently changeable.
+
+2. **How is the Bridge Pattern different from the Adapter Pattern?**
+
+   * Bridge Pattern decouples an abstraction from its implementation, while Adapter Pattern allows incompatible interfaces to work together.
+
+3. **What are the key components of the Bridge Pattern?**
+
+   * Abstraction, Implementer, Concrete Implementer, and Refined Abstraction.
+
+4. **Can you provide a real-world example of the Bridge Pattern?**
+
+   * A remote control (Abstraction) that can work with multiple devices like TV, Radio, or Projector (Implementer).
+
+5. **How would you extend the Bridge Pattern to support more devices?**
+
+   * By adding new classes implementing the IDevice interface.
+
+---
+
 
 ## 8. Composite Pattern
 
-* **Definition:** Composes objects into tree structures to represent part-whole hierarchies.
-* **When to Use:** Use when you need to work with tree-like structures.
-* **Similar Patterns to Learn:** Decorator, Flyweight.
+## Definition
+
+* **Composite Pattern** is a structural design pattern that allows you to compose objects into tree structures to represent part-whole hierarchies.
+* It treats individual objects and compositions of objects uniformly, allowing clients to work with them in the same way.
+
+## When to Use
+
+* When you need to represent part-whole hierarchies (tree structures).
+* When you want to treat individual objects and their compositions uniformly.
+* When building hierarchical structures like file systems, menus, or organizational charts.
+
+## Key Components
+
+* **Component:** Declares the interface for objects in the composition.
+* **Leaf:** Represents individual objects that do not have children.
+* **Composite:** Manages child components and can contain other composite or leaf objects.
+* **Client:** Interacts with the component interface, treating all objects uniformly.
+
+## Real-World Analogy
+
+* Think of a "File System." A folder can contain files (leaves) or other folders (composites). The client can treat both files and folders uniformly.
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Component Interface
 
 ```csharp
-public interface IComponent
+// Component - Defines the common interface
+public interface IFileSystemItem
 {
-    void Display();
+    void Display(int depth = 0);
 }
+```
 
-public class Leaf : IComponent
+### Step 2: Create Leaf (Individual Object)
+
+```csharp
+// Leaf - Represents a file
+public class File : IFileSystemItem
 {
-    public void Display() => Console.WriteLine("Leaf");
-}
+    private readonly string _name;
 
-public class Composite : IComponent
-{
-    private readonly List<IComponent> _children = new List<IComponent>();
-
-    public void Add(IComponent component) => _children.Add(component);
-
-    public void Display()
+    public File(string name)
     {
-        Console.WriteLine("Composite");
-        foreach (var child in _children) child.Display();
+        _name = name;
+    }
+
+    public void Display(int depth = 0)
+    {
+        Console.WriteLine(new string('-', depth) + _name);
     }
 }
 ```
 
-## 9. Decorator Pattern
-
-* **Definition:** Adds responsibilities to an object dynamically.
-* **When to Use:** Use when you need to add features to an object without modifying its class.
-* **Similar Patterns to Learn:** Proxy, Composite.
+### Step 3: Create Composite (Folder)
 
 ```csharp
+// Composite - Represents a folder
+public class Folder : IFileSystemItem
+{
+    private readonly string _name;
+    private readonly List<IFileSystemItem> _items = new List<IFileSystemItem>();
+
+    public Folder(string name)
+    {
+        _name = name;
+    }
+
+    public void AddItem(IFileSystemItem item)
+    {
+        _items.Add(item);
+    }
+
+    public void Display(int depth = 0)
+    {
+        Console.WriteLine(new string('-', depth) + _name);
+
+        foreach (var item in _items)
+        {
+            item.Display(depth + 2);
+        }
+    }
+}
+```
+
+### Step 4: Usage
+
+```csharp
+// Example usage of the Composite Pattern
+var rootFolder = new Folder("Root");
+var subFolder1 = new Folder("Documents");
+var subFolder2 = new Folder("Pictures");
+
+rootFolder.AddItem(new File("ReadMe.txt"));
+subFolder1.AddItem(new File("Resume.pdf"));
+subFolder1.AddItem(new File("Report.docx"));
+subFolder2.AddItem(new File("Photo1.png"));
+subFolder2.AddItem(new File("Photo2.jpg"));
+
+rootFolder.AddItem(subFolder1);
+rootFolder.AddItem(subFolder2);
+
+rootFolder.Display();
+```
+
+### Output
+
+```
+-Root
+--ReadMe.txt
+--Documents
+----Resume.pdf
+----Report.docx
+--Pictures
+----Photo1.png
+----Photo2.jpg
+```
+
+## Benefits
+
+* Allows you to work with tree structures and hierarchies easily.
+* Treats individual objects and their compositions uniformly.
+* Simplifies client code by allowing uniform handling of both leaves and composites.
+
+## Similar Patterns to Learn
+
+* **Decorator Pattern:** Adds responsibilities to an object dynamically.
+* **Flyweight Pattern:** Shares objects to reduce memory usage.
+
+## Common Mistakes (Watchouts)
+
+* Overusing the Composite Pattern for simple structures.
+* Creating complex hierarchies that are difficult to manage.
+
+## Interview Questions with Answers
+
+1. **What is the Composite Pattern, and why would you use it?**
+
+   * The Composite Pattern is a structural design pattern that allows you to compose objects into tree structures to represent part-whole hierarchies. It is used when you need to work with tree-like structures.
+
+2. **How is the Composite Pattern different from the Decorator Pattern?**
+
+   * Composite Pattern creates tree structures, while Decorator Pattern adds responsibilities to objects without changing their structure.
+
+3. **What are the main components of the Composite Pattern?**
+
+   * Component, Leaf, Composite, and Client.
+
+4. **Can you provide a real-world example of the Composite Pattern?**
+
+   * A file system where folders can contain files or other folders.
+
+5. **How would you extend the Composite Pattern to support file deletion?**
+
+   * Add a Delete() method to the IFileSystemItem interface and implement it in both Leaf and Composite classes.
+
+---
+
+
+## 9. Decorator Pattern
+
+## Definition
+
+* **Decorator Pattern** is a structural design pattern that allows you to dynamically add new behaviors or responsibilities to an object without modifying its existing class.
+* It is an alternative to subclassing for extending functionality.
+
+## When to Use
+
+* When you need to add features to an object without modifying its class.
+* When you want to add responsibilities to an object at runtime.
+* When subclassing is not feasible due to a large number of possible combinations.
+
+## Key Components
+
+* **Component:** Defines the interface for objects that can have responsibilities added to them.
+* **Concrete Component:** The base object that will be decorated.
+* **Decorator:** An abstract class that implements the component interface and has a reference to a component.
+* **Concrete Decorators:** Add specific behaviors or responsibilities to the component.
+
+## Real-World Analogy
+
+* Think of a "Coffee Shop." You have a basic coffee (Component), and you can add various toppings (Decorators) like milk, sugar, whipped cream, or caramel.
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Component Interface
+
+```csharp
+// Component - Defines the base interface
 public interface ICoffee
 {
     string GetDescription();
+    double GetCost();
 }
+```
 
+### Step 2: Create the Concrete Component
+
+```csharp
+// Concrete Component - Basic Coffee
 public class BasicCoffee : ICoffee
 {
     public string GetDescription() => "Basic Coffee";
+
+    public double GetCost() => 2.0;
 }
+```
 
-public class MilkDecorator : ICoffee
+### Step 3: Create the Decorator
+
+```csharp
+// Decorator - Base Decorator
+public abstract class CoffeeDecorator : ICoffee
 {
-    private readonly ICoffee _coffee;
+    protected ICoffee _coffee;
 
-    public MilkDecorator(ICoffee coffee)
+    protected CoffeeDecorator(ICoffee coffee)
     {
         _coffee = coffee;
     }
 
-    public string GetDescription() => _coffee.GetDescription() + ", Milk";
+    public virtual string GetDescription() => _coffee.GetDescription();
+
+    public virtual double GetCost() => _coffee.GetCost();
 }
 ```
+
+### Step 4: Create Concrete Decorators
+
+```csharp
+// Concrete Decorator - Milk
+public class MilkDecorator : CoffeeDecorator
+{
+    public MilkDecorator(ICoffee coffee) : base(coffee) { }
+
+    public override string GetDescription() => _coffee.GetDescription() + ", Milk";
+
+    public override double GetCost() => _coffee.GetCost() + 0.5;
+}
+
+// Concrete Decorator - Sugar
+public class SugarDecorator : CoffeeDecorator
+{
+    public SugarDecorator(ICoffee coffee) : base(coffee) { }
+
+    public override string GetDescription() => _coffee.GetDescription() + ", Sugar";
+
+    public override double GetCost() => _coffee.GetCost() + 0.2;
+}
+```
+
+### Step 5: Usage
+
+```csharp
+// Example usage of the Decorator Pattern
+ICoffee basicCoffee = new BasicCoffee();
+Console.WriteLine($"Description: {basicCoffee.GetDescription()}, Cost: ${basicCoffee.GetCost()}");
+
+// Add Milk
+ICoffee milkCoffee = new MilkDecorator(basicCoffee);
+Console.WriteLine($"Description: {milkCoffee.GetDescription()}, Cost: ${milkCoffee.GetCost()}");
+
+// Add Sugar
+ICoffee sweetMilkCoffee = new SugarDecorator(milkCoffee);
+Console.WriteLine($"Description: {sweetMilkCoffee.GetDescription()}, Cost: ${sweetMilkCoffee.GetCost()}");
+```
+
+### Output
+
+```
+Description: Basic Coffee, Cost: $2.0
+Description: Basic Coffee, Milk, Cost: $2.5
+Description: Basic Coffee, Milk, Sugar, Cost: $2.7
+```
+
+## Benefits
+
+* Allows flexible extension of object behavior without modifying existing code.
+* Promotes the open/closed principle (open for extension, closed for modification).
+* Allows you to combine multiple decorators dynamically.
+
+## Similar Patterns to Learn
+
+* **Proxy Pattern:** Provides a surrogate or placeholder for another object.
+* **Composite Pattern:** Composes objects into tree structures to represent part-whole hierarchies.
+
+## Common Mistakes (Watchouts)
+
+* Overusing the Decorator Pattern, leading to a complex, hard-to-read structure.
+* Confusing the Decorator Pattern with Inheritance.
+
+## Interview Questions with Answers
+
+1. **What is the Decorator Pattern, and why would you use it?**
+
+   * The Decorator Pattern is a structural design pattern that allows you to add new behaviors or responsibilities to an object dynamically without modifying its class. It is used to extend object functionality.
+
+2. **How is the Decorator Pattern different from the Proxy Pattern?**
+
+   * Decorator adds new behaviors to an object, while Proxy controls access to an object.
+
+3. **What are the main components of the Decorator Pattern?**
+
+   * Component, Concrete Component, Decorator, and Concrete Decorators.
+
+4. **Can you provide a real-world example of the Decorator Pattern?**
+
+   * A coffee shop where you can add toppings to a basic coffee, like milk, sugar, whipped cream.
+
+5. **How would you extend the Decorator Pattern to add more toppings?**
+
+   * By creating additional Concrete Decorators (e.g., WhippedCreamDecorator, CaramelDecorator).
+
+---
+
 
 ## 10. Facade Pattern
 
-* **Definition:** Provides a unified interface to a set of interfaces in a subsystem.
-* **When to Use:** Use when you want to simplify complex subsystems.
-* **Similar Patterns to Learn:** Mediator, Adapter.
+## Definition
+
+* **Facade Pattern** is a structural design pattern that provides a unified and simplified interface to a set of interfaces in a complex subsystem.
+* It hides the complexity of the subsystem by providing a simple interface for the client.
+
+## When to Use
+
+* When you want to simplify complex subsystems.
+* When you want to provide a simple interface for a complex system with multiple classes.
+* When you want to decouple clients from complex subsystem components.
+
+## Key Components
+
+* **Facade:** Provides a simple interface to the complex subsystem.
+* **Subsystem Classes:** The complex classes that the facade interacts with.
+* **Client:** Uses the facade to interact with the subsystem without knowing its complexity.
+
+## Real-World Analogy
+
+* Think of a "Restaurant Menu." The customer (Client) can order food using the menu (Facade) without knowing how each dish is prepared in the kitchen (Subsystem).
+
+## Full C# Example with Explanation
+
+### Step 1: Create the Subsystem Classes
 
 ```csharp
-public class SubsystemA
+// Subsystem Class - Order Processing
+public class OrderProcessor
 {
-    public void OperationA() => Console.WriteLine("Subsystem A operation");
-}
-
-public class SubsystemB
-{
-    public void OperationB() => Console.WriteLine("Subsystem B operation");
-}
-
-public class Facade
-{
-    private readonly SubsystemA _subsystemA = new SubsystemA();
-    private readonly SubsystemB _subsystemB = new SubsystemB();
-
-    public void PerformOperations()
+    public void ProcessOrder(string item)
     {
-        _subsystemA.OperationA();
-        _subsystemB.OperationB();
-    }
-}
-```
-# Design Patterns 7-15: Full Details with Code
-
-## 7. Bridge Pattern
-
-* **Definition:** Separates an abstraction from its implementation so that they can vary independently.
-* **When to Use:** Use when you want to decouple abstraction and implementation.
-* **Similar Patterns to Learn:** Adapter, Composite.
-
-```csharp
-public interface IRenderer
-{
-    void RenderShape(string shape);
-}
-
-public class VectorRenderer : IRenderer
-{
-    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with vectors");
-}
-
-public class RasterRenderer : IRenderer
-{
-    public void RenderShape(string shape) => Console.WriteLine($"Drawing {shape} with pixels");
-}
-
-public class Shape
-{
-    protected IRenderer renderer;
-
-    public Shape(IRenderer renderer)
-    {
-        this.renderer = renderer;
+        Console.WriteLine($"Processing order for {item}");
     }
 }
 
-public class Circle : Shape
+// Subsystem Class - Payment Gateway
+public class PaymentProcessor
 {
-    public Circle(IRenderer renderer) : base(renderer) { }
-
-    public void Draw() => renderer.RenderShape("Circle");
-}
-```
-
-## 8. Composite Pattern
-
-* **Definition:** Composes objects into tree structures to represent part-whole hierarchies.
-* **When to Use:** Use when you need to work with tree-like structures.
-* **Similar Patterns to Learn:** Decorator, Flyweight.
-
-```csharp
-public interface IComponent
-{
-    void Display();
-}
-
-public class Leaf : IComponent
-{
-    public void Display() => Console.WriteLine("Leaf");
-}
-
-public class Composite : IComponent
-{
-    private readonly List<IComponent> _children = new List<IComponent>();
-
-    public void Add(IComponent component) => _children.Add(component);
-
-    public void Display()
+    public void ProcessPayment(double amount)
     {
-        Console.WriteLine("Composite");
-        foreach (var child in _children) child.Display();
+        Console.WriteLine($"Processing payment of ${amount}");
+    }
+}
+
+// Subsystem Class - Notification Service
+public class NotificationService
+{
+    public void SendNotification(string message)
+    {
+        Console.WriteLine($"Sending notification: {message}");
     }
 }
 ```
 
-## 9. Decorator Pattern
-
-* **Definition:** Adds responsibilities to an object dynamically.
-* **When to Use:** Use when you need to add features to an object without modifying its class.
-* **Similar Patterns to Learn:** Proxy, Composite.
+### Step 2: Create the Facade
 
 ```csharp
-public interface ICoffee
+// Facade - Simplified interface for the subsystem
+public class OrderFacade
 {
-    string GetDescription();
-}
+    private readonly OrderProcessor _orderProcessor = new OrderProcessor();
+    private readonly PaymentProcessor _paymentProcessor = new PaymentProcessor();
+    private readonly NotificationService _notificationService = new NotificationService();
 
-public class BasicCoffee : ICoffee
-{
-    public string GetDescription() => "Basic Coffee";
-}
-
-public class MilkDecorator : ICoffee
-{
-    private readonly ICoffee _coffee;
-
-    public MilkDecorator(ICoffee coffee)
+    public void PlaceOrder(string item, double amount)
     {
-        _coffee = coffee;
-    }
-
-    public string GetDescription() => _coffee.GetDescription() + ", Milk";
-}
-```
-
-## 10. Facade Pattern
-
-* **Definition:** Provides a unified interface to a set of interfaces in a subsystem.
-* **When to Use:** Use when you want to simplify complex subsystems.
-* **Similar Patterns to Learn:** Mediator, Adapter.
-
-```csharp
-public class SubsystemA
-{
-    public void OperationA() => Console.WriteLine("Subsystem A operation");
-}
-
-public class SubsystemB
-{
-    public void OperationB() => Console.WriteLine("Subsystem B operation");
-}
-
-public class Facade
-{
-    private readonly SubsystemA _subsystemA = new SubsystemA();
-    private readonly SubsystemB _subsystemB = new SubsystemB();
-
-    public void PerformOperations()
-    {
-        _subsystemA.OperationA();
-        _subsystemB.OperationB();
+        Console.WriteLine("Starting Order Process...");
+        _orderProcessor.ProcessOrder(item);
+        _paymentProcessor.ProcessPayment(amount);
+        _notificationService.SendNotification($"Order for {item} has been placed.");
+        Console.WriteLine("Order Process Complete.");
     }
 }
 ```
+
+### Step 3: Usage
+
+```csharp
+// Example usage of the Facade Pattern
+var orderFacade = new OrderFacade();
+orderFacade.PlaceOrder("Pizza", 15.99);
+```
+
+### Output
+
+```
+Starting Order Process...
+Processing order for Pizza
+Processing payment of $15.99
+Sending notification: Order for Pizza has been placed.
+Order Process Complete.
+```
+
+## Benefits
+
+* Simplifies the use of a complex subsystem.
+* Provides a clear and easy-to-use interface for clients.
+* Decouples clients from the complex subsystem, promoting loose coupling.
+
+## Similar Patterns to Learn
+
+* **Mediator Pattern:** Coordinates interactions between multiple objects without direct coupling.
+* **Adapter Pattern:** Converts the interface of a class into another interface clients expect.
+
+## Common Mistakes (Watchouts)
+
+* Overusing Facade for simple systems (overengineering).
+* Directly exposing the subsystem classes without any simplification.
+
+## Interview Questions with Answers
+
+1. **What is the Facade Pattern, and why would you use it?**
+
+   * The Facade Pattern is a structural design pattern that provides a unified and simplified interface to a complex subsystem. It is used to simplify complex systems.
+
+2. **How is the Facade Pattern different from the Adapter Pattern?**
+
+   * Facade simplifies a complex system by providing a unified interface, while Adapter converts one interface into another.
+
+3. **What are the main components of the Facade Pattern?**
+
+   * Facade, Subsystem Classes, and Client.
+
+4. **Can you provide a real-world example of the Facade Pattern?**
+
+   * A restaurant menu (Facade) that allows customers to order food without knowing how each dish is prepared (Subsystem).
+
+5. **How would you extend the Facade Pattern to add more features?**
+
+   * By adding more methods to the Facade class that combine subsystem functionality in different ways.
+
 
 ## 11. Flyweight Pattern
 
-* **Definition:** Reduces memory usage by sharing common state among multiple objects.
-* **When to Use:** Use when you need to create a large number of similar objects.
-* **Similar Patterns to Learn:** Singleton, Prototype.
+## Definition
+
+* **Flyweight Pattern** is a structural design pattern that reduces memory usage by sharing common state among multiple objects.
+* It optimizes resource usage by minimizing the number of objects created.
+
+## When to Use
+
+* When you need to create a large number of similar objects.
+* When memory consumption is a concern.
+* When most of the object data can be shared across multiple instances.
+
+## Key Components
+
+* **Flyweight Interface:** Declares methods for sharing intrinsic state.
+* **Concrete Flyweight:** Implements the flyweight interface and shares intrinsic state.
+* **Unshared Concrete Flyweight:** Objects that do not share state.
+* **Flyweight Factory:** Manages the creation and reuse of flyweight objects.
+* **Client:** Uses the flyweight objects via the factory.
+
+## Real-World Analogy
+
+* Think of a "Text Editor" that displays repeated characters on the screen. Instead of creating a new object for each character, it uses the same object for each repeated character (like the letter 'A').
+
+## Full C# Example with Explanation
+
+### Step 1: Define the Flyweight Interface
 
 ```csharp
-public class Character
+// Flyweight Interface
+public interface IShape
 {
-    public char Symbol { get; set; }
-    public string Font { get; set; }
+    void Draw(string color);
 }
+```
 
-public class CharacterFactory
+### Step 2: Create the Concrete Flyweight
+
+```csharp
+// Concrete Flyweight - Circle
+public class Circle : IShape
 {
-    private readonly Dictionary<char, Character> _characters = new();
+    private readonly string _shapeType = "Circle";
 
-    public Character GetCharacter(char symbol)
+    public void Draw(string color)
     {
-        if (!_characters.ContainsKey(symbol))
-        {
-            _characters[symbol] = new Character { Symbol = symbol };
-        }
-        return _characters[symbol];
+        Console.WriteLine($"Drawing {_shapeType} with color {color}");
     }
 }
 ```
+
+### Step 3: Create the Flyweight Factory
+
+```csharp
+// Flyweight Factory - Manages flyweight instances
+public class ShapeFactory
+{
+    private static readonly Dictionary<string, IShape> _shapes = new();
+
+    public static IShape GetShape(string shapeType)
+    {
+        if (!_shapes.ContainsKey(shapeType))
+        {
+            _shapes[shapeType] = new Circle();
+            Console.WriteLine($"Creating new {shapeType} object.");
+        }
+
+        return _shapes[shapeType];
+    }
+}
+```
+
+### Step 4: Usage
+
+```csharp
+// Example usage of the Flyweight Pattern
+var circle1 = ShapeFactory.GetShape("Circle");
+circle1.Draw("Red");
+
+var circle2 = ShapeFactory.GetShape("Circle");
+circle2.Draw("Green");
+
+var circle3 = ShapeFactory.GetShape("Circle");
+circle3.Draw("Blue");
+```
+
+### Output
+
+```
+Creating new Circle object.
+Drawing Circle with color Red
+Drawing Circle with color Green
+Drawing Circle with color Blue
+```
+
+## Benefits
+
+* Reduces memory usage by sharing objects.
+* Increases efficiency when dealing with a large number of similar objects.
+
+## Similar Patterns to Learn
+
+* **Singleton Pattern:** Ensures a class has only one instance.
+* **Prototype Pattern:** Creates objects by copying an existing object (clone).
+
+## Common Mistakes (Watchouts)
+
+* Misusing Flyweight for objects with unique state (should only be used for shared state).
+* Overcomplicating the Flyweight Factory with too many conditions.
+
+## Interview Questions with Answers
+
+1. **What is the Flyweight Pattern, and why would you use it?**
+
+   * The Flyweight Pattern is a structural design pattern that reduces memory usage by sharing common state among multiple objects. It is used to optimize memory in large systems.
+
+2. **How is the Flyweight Pattern different from the Singleton Pattern?**
+
+   * Flyweight shares common state across multiple objects, while Singleton ensures only one instance of an object exists.
+
+3. **What is the difference between intrinsic and extrinsic state in Flyweight Pattern?**
+
+   * Intrinsic state is shared and remains the same, while extrinsic state is passed externally and can vary.
+
+4. **Can you provide a real-world example of the Flyweight Pattern?**
+
+   * A text editor reusing character objects for frequently used letters like 'A' instead of creating a new object each time.
+
+5. **How would you extend the Flyweight Pattern to support more shapes?**
+
+   * By adding more shape classes (e.g., Square, Triangle) and handling them in the ShapeFactory.
+
+---
+
 
 ## 12. Proxy Pattern
 
