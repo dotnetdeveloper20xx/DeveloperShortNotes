@@ -1955,3 +1955,915 @@ var emailNotification = new EmailNotification();
 orderService.PlaceOrder("Book");
 emailNotification.SendEmail("Your order for Book is confirmed.");
 ```
+# Architecture Patterns 1-3: Full Details with Code
+
+## 1. Layered (N-Tier) Architecture
+
+* **Definition:** Organizes an application into logical layers, such as Presentation, Business Logic, and Data Access.
+* **When to Use:** Use when you want a clear separation of concerns and easy maintainability.
+* **Similar Patterns to Learn:** Clean Architecture, Hexagonal Architecture.
+
+### Advantages:
+
+* Clear separation of concerns.
+* Easy to maintain and scale.
+* Testable due to independent layers.
+
+### Disadvantages:
+
+* Can become tightly coupled.
+* Changes in one layer may require changes in others.
+
+### Example: Layered Architecture in C\#
+
+```csharp
+// Presentation Layer
+public class ProductController
+{
+    private readonly ProductService _service = new ProductService();
+
+    public void DisplayProducts()
+    {
+        var products = _service.GetProducts();
+        Console.WriteLine(string.Join(", ", products));
+    }
+}
+
+// Business Logic Layer
+public class ProductService
+{
+    private readonly ProductRepository _repository = new ProductRepository();
+
+    public List<string> GetProducts() => _repository.FetchProducts();
+}
+
+// Data Access Layer
+public class ProductRepository
+{
+    public List<string> FetchProducts() => new List<string> { "Apple", "Banana", "Orange" };
+}
+
+// Usage
+var controller = new ProductController();
+controller.DisplayProducts();
+```
+
+## 2. Clean Architecture (Onion Architecture)
+
+* **Definition:** Organizes code into concentric layers, ensuring that dependencies always point inward towards the core.
+* **When to Use:** Use when you need a scalable, maintainable architecture that is independent of frameworks.
+* **Similar Patterns to Learn:** Hexagonal Architecture, CQRS.
+
+### Advantages:
+
+* Highly testable due to dependency inversion.
+* Independent of frameworks.
+* Flexible and maintainable.
+
+### Disadvantages:
+
+* Initial complexity.
+* Requires strict adherence to principles.
+
+### Example: Clean Architecture in C\#
+
+```csharp
+// Core (Entities and Interfaces)
+public class Product
+{
+    public string Name { get; set; }
+}
+
+public interface IProductService
+{
+    List<Product> GetAllProducts();
+}
+
+// Application Layer
+public class ProductService : IProductService
+{
+    private readonly IProductRepository _repository;
+
+    public ProductService(IProductRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public List<Product> GetAllProducts() => _repository.GetProducts();
+}
+
+// Infrastructure Layer
+public interface IProductRepository
+{
+    List<Product> GetProducts();
+}
+
+public class ProductRepository : IProductRepository
+{
+    public List<Product> GetProducts() => new List<Product> { new Product { Name = "Apple" } };
+}
+
+// Presentation Layer
+public class ProductController
+{
+    private readonly IProductService _service;
+
+    public ProductController(IProductService service)
+    {
+        _service = service;
+    }
+
+    public void ShowProducts()
+    {
+        var products = _service.GetAllProducts();
+        Console.WriteLine(string.Join(", ", products.Select(p => p.Name)));
+    }
+}
+
+// Usage
+var repo = new ProductRepository();
+var service = new ProductService(repo);
+var controller = new ProductController(service);
+controller.ShowProducts();
+```
+
+## 3. Hexagonal Architecture (Ports and Adapters)
+
+* **Definition:** Emphasizes decoupling between the application core and external systems using ports (interfaces) and adapters (implementations).
+* **When to Use:** Use when you want a clean, testable, and framework-independent architecture.
+* **Similar Patterns to Learn:** Clean Architecture, Layered Architecture.
+
+### Advantages:
+
+* High testability.
+* Framework independent.
+* Easy to replace external components.
+
+### Disadvantages:
+
+* Complexity increases with large systems.
+* Requires careful design.
+
+### Example: Hexagonal Architecture in C\#
+
+```csharp
+// Core (Ports)
+public interface INotificationService
+{
+    void Send(string message);
+}
+
+// Application Core
+public class OrderService
+{
+    private readonly INotificationService _notificationService;
+
+    public OrderService(INotificationService notificationService)
+    {
+        _notificationService = notificationService;
+    }
+
+    public void PlaceOrder(string product)
+    {
+        Console.WriteLine($"Order placed for {product}");
+        _notificationService.Send("Order placed: " + product);
+    }
+}
+
+// Adapter (Infrastructure)
+public class EmailNotification : INotificationService
+{
+    public void Send(string message) => Console.WriteLine("Email sent: " + message);
+}
+
+// Usage
+var emailService = new EmailNotification();
+var orderService = new OrderService(emailService);
+orderService.PlaceOrder("Laptop");
+```
+# Architecture Patterns 4-6: Full Details with Code
+
+## 4. Microservices Architecture
+
+* **Definition:** Organizes an application into a collection of small, loosely coupled services, each responsible for a specific domain.
+* **When to Use:** Use when you want independent deployment, scalability, and maintainability of services.
+* **Similar Patterns to Learn:** Event-Driven Architecture, CQRS.
+
+### Advantages:
+
+* Independent deployment.
+* Scalability of individual services.
+* Fault isolation.
+
+### Disadvantages:
+
+* Increased complexity.
+* Network latency between services.
+
+### Example: Microservices Architecture in C# (Basic Implementation)
+
+```csharp
+// Order Service (Microservice 1)
+public class OrderService
+{
+    public void CreateOrder(string product)
+    {
+        Console.WriteLine($"Order created for {product}");
+    }
+}
+
+// Payment Service (Microservice 2)
+public class PaymentService
+{
+    public void ProcessPayment(string product)
+    {
+        Console.WriteLine($"Payment processed for {product}");
+    }
+}
+
+// API Gateway (Simplified)
+public class ApiGateway
+{
+    private readonly OrderService _orderService = new();
+    private readonly PaymentService _paymentService = new();
+
+    public void PlaceOrder(string product)
+    {
+        _orderService.CreateOrder(product);
+        _paymentService.ProcessPayment(product);
+    }
+}
+
+// Usage
+var gateway = new ApiGateway();
+gateway.PlaceOrder("Laptop");
+```
+
+## 5. Event-Driven Architecture
+
+* **Definition:** Uses events to trigger and communicate between services, providing real-time processing.
+* **When to Use:** Use when you want highly decoupled services that respond to events.
+* **Similar Patterns to Learn:** Microservices, CQRS.
+
+### Advantages:
+
+* Loose coupling between components.
+* Real-time processing.
+* High scalability.
+
+### Disadvantages:
+
+* Complex debugging.
+* Event consistency management.
+
+### Example: Event-Driven Architecture in C\#
+
+```csharp
+// Event Publisher
+public class EventPublisher
+{
+    public event Action<string> OnEvent;
+
+    public void PublishEvent(string message) => OnEvent?.Invoke(message);
+}
+
+// Event Subscriber
+public class EventSubscriber
+{
+    public void OnEventReceived(string message)
+    {
+        Console.WriteLine("Event Received: " + message);
+    }
+}
+
+// Usage
+var publisher = new EventPublisher();
+var subscriber = new EventSubscriber();
+publisher.OnEvent += subscriber.OnEventReceived;
+publisher.PublishEvent("Order Placed");
+```
+
+## 6. CQRS (Command Query Responsibility Segregation)
+
+* **Definition:** Separates read (Query) and write (Command) operations for improved scalability and performance.
+* **When to Use:** Use when you want to optimize read and write operations separately.
+* **Similar Patterns to Learn:** Event Sourcing, Microservices.
+
+### Advantages:
+
+* Optimized read and write operations.
+* Clear separation of concerns.
+* Scalable read models.
+
+### Disadvantages:
+
+* Increased complexity.
+* Data consistency challenges.
+
+### Example: CQRS in C\#
+
+```csharp
+// Command (Write)
+public class CreateOrderCommand
+{
+    public string ProductName { get; set; }
+}
+
+public class OrderCommandHandler
+{
+    public void Handle(CreateOrderCommand command)
+    {
+        Console.WriteLine($"Order created: {command.ProductName}");
+    }
+}
+
+// Query (Read)
+public class OrderQuery
+{
+    public string GetOrderDetails() => "Order Details: Product X";
+}
+
+// Usage
+var commandHandler = new OrderCommandHandler();
+commandHandler.Handle(new CreateOrderCommand { ProductName = "Laptop" });
+
+var query = new OrderQuery();
+Console.WriteLine(query.GetOrderDetails());
+```
+# Architecture Patterns 7-9: Full Details with Code
+
+## 7. Monolithic Architecture
+
+* **Definition:** A single unified application where all components are tightly coupled and run as a single unit.
+* **When to Use:** Use when you need a simple, fast-to-deploy application without complex service interactions.
+* **Similar Patterns to Learn:** Layered Architecture, Modular Monolith.
+
+### Advantages:
+
+* Simple deployment.
+* Easy to develop initially.
+* All components run in a single process.
+
+### Disadvantages:
+
+* Difficult to scale independently.
+* Changes in one area can affect the entire application.
+* Harder to maintain with increasing complexity.
+
+### Example: Monolithic Architecture in C\#
+
+```csharp
+// Monolithic Application
+public class ProductService
+{
+    public void AddProduct(string product)
+    {
+        Console.WriteLine($"Product added: {product}");
+    }
+
+    public void ListProducts()
+    {
+        Console.WriteLine("Product list: Apple, Banana, Orange");
+    }
+}
+
+// Usage
+var service = new ProductService();
+service.AddProduct("Laptop");
+service.ListProducts();
+```
+
+## 8. Serverless Architecture
+
+* **Definition:** A cloud-native architecture where applications are built using managed services (like Azure Functions, AWS Lambda) that automatically scale.
+* **When to Use:** Use when you want automatic scaling, no server management, and pay-per-use pricing.
+* **Similar Patterns to Learn:** Microservices, Event-Driven Architecture.
+
+### Advantages:
+
+* No server management.
+* Automatic scaling.
+* Cost-effective (pay-per-use).
+
+### Disadvantages:
+
+* Limited execution time (timeout).
+* Cold start latency.
+
+### Example: Serverless Architecture in C# (Azure Function)
+
+```csharp
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using System.Threading.Tasks;
+
+public static class ProductFunction
+{
+    [Function("ProductFunction")]
+    public static async Task<HttpResponseData> Run(
+        [HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequestData req)
+    {
+        var response = req.CreateResponse();
+        response.WriteString("Serverless Product List: Apple, Banana, Orange");
+        return response;
+    }
+}
+```
+
+## 9. Service-Oriented Architecture (SOA)
+
+* **Definition:** An architecture where an application is composed of reusable services that communicate over a network.
+* **When to Use:** Use when you need to build an application with loosely coupled services that can be reused.
+* **Similar Patterns to Learn:** Microservices, API Gateway.
+
+### Advantages:
+
+* Service reusability.
+* Interoperability between services.
+* Scalable and maintainable.
+
+### Disadvantages:
+
+* Overhead of service communication.
+* Complex service orchestration.
+
+### Example: Service-Oriented Architecture in C\#
+
+```csharp
+// Product Service
+public class ProductService
+{
+    public string GetProduct() => "Apple";
+}
+
+// Order Service
+public class OrderService
+{
+    private readonly ProductService _productService = new();
+
+    public void CreateOrder()
+    {
+        var product = _productService.GetProduct();
+        Console.WriteLine($"Order created for {product}");
+    }
+}
+
+// Usage
+var orderService = new OrderService();
+orderService.CreateOrder();
+```
+# Architecture Patterns 10-12: Full Details with Code
+
+## 10. Microkernel Architecture (Plugin-Based Architecture)
+
+* **Definition:** Provides a core system with minimal functionality, and additional features are provided through plugins.
+* **When to Use:** Use when you want a modular system with extensible features.
+* **Similar Patterns to Learn:** Modular Monolith, Plugin Pattern.
+
+### Advantages:
+
+* Highly extensible with plugins.
+* Core system remains lightweight.
+* Easy to add or remove features.
+
+### Disadvantages:
+
+* Complex plugin management.
+* Plugin conflicts can occur.
+
+### Example: Microkernel Architecture in C\#
+
+```csharp
+// Core System
+public class ApplicationCore
+{
+    private readonly List<IPlugin> _plugins = new();
+
+    public void RegisterPlugin(IPlugin plugin) => _plugins.Add(plugin);
+
+    public void Run()
+    {
+        Console.WriteLine("Core Application Running.");
+        foreach (var plugin in _plugins)
+            plugin.Execute();
+    }
+}
+
+// Plugin Interface
+public interface IPlugin
+{
+    void Execute();
+}
+
+// Example Plugins
+public class LoggingPlugin : IPlugin
+{
+    public void Execute() => Console.WriteLine("Logging Plugin Executed.");
+}
+
+public class SecurityPlugin : IPlugin
+{
+    public void Execute() => Console.WriteLine("Security Plugin Executed.");
+}
+
+// Usage
+var app = new ApplicationCore();
+app.RegisterPlugin(new LoggingPlugin());
+app.RegisterPlugin(new SecurityPlugin());
+app.Run();
+```
+
+## 11. Modular Monolith Architecture
+
+* **Definition:** A monolithic architecture with modular components that can be independently developed and maintained.
+* **When to Use:** Use when you want modularity but without the complexity of microservices.
+* **Similar Patterns to Learn:** Microservices, Layered Architecture.
+
+### Advantages:
+
+* Easy to develop and maintain.
+* Strong modularity without microservices overhead.
+* Single deployment unit.
+
+### Disadvantages:
+
+* Still has some monolithic limitations.
+* Scaling requires scaling the entire application.
+
+### Example: Modular Monolith in C\#
+
+```csharp
+// Module: Product Module
+namespace ProductModule
+{
+    public class ProductService
+    {
+        public void DisplayProduct() => Console.WriteLine("Product: Apple");
+    }
+}
+
+// Module: Order Module
+namespace OrderModule
+{
+    public class OrderService
+    {
+        public void CreateOrder() => Console.WriteLine("Order Created");
+    }
+}
+
+// Main Application
+using ProductModule;
+using OrderModule;
+
+var productService = new ProductService();
+productService.DisplayProduct();
+
+var orderService = new OrderService();
+orderService.CreateOrder();
+```
+
+## 12. Clean Microservices Architecture
+
+* **Definition:** A scalable microservices architecture with clean architecture principles (separation of concerns, dependency inversion).
+* **When to Use:** Use when you want scalable, independent services following clean architecture.
+* **Similar Patterns to Learn:** Microservices, Clean Architecture.
+
+### Advantages:
+
+* Highly scalable.
+* Clear separation of concerns.
+* Testable services.
+
+### Disadvantages:
+
+* Initial complexity.
+* Requires strict design discipline.
+
+### Example: Clean Microservices Architecture in C\#
+
+```csharp
+// Product Microservice (Application Layer)
+public class ProductService
+{
+    private readonly IProductRepository _repository;
+
+    public ProductService(IProductRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public string GetProduct() => _repository.GetProduct();
+}
+
+// Product Microservice (Infrastructure Layer)
+public interface IProductRepository
+{
+    string GetProduct();
+}
+
+public class ProductRepository : IProductRepository
+{
+    public string GetProduct() => "Apple";
+}
+
+// API Layer
+var repository = new ProductRepository();
+var service = new ProductService(repository);
+Console.WriteLine(service.GetProduct());
+```
+# Architecture Patterns 13-15: Full Details with Code
+
+## 13. Clean Serverless Architecture
+
+* **Definition:** Combines serverless computing with clean architecture principles, ensuring separation of concerns.
+* **When to Use:** Use when you want a scalable, maintainable, and cleanly organized serverless application.
+* **Similar Patterns to Learn:** Serverless, Clean Architecture.
+
+### Advantages:
+
+* Automatic scaling (serverless).
+* Clean separation of concerns.
+* Testable business logic.
+
+### Disadvantages:
+
+* Complexity increases with large systems.
+* Cold start latency.
+
+### Example: Clean Serverless Architecture in C# (Azure Function)
+
+```csharp
+// Core Layer (Business Logic)
+public interface IProductService
+{
+    string GetProduct();
+}
+
+public class ProductService : IProductService
+{
+    public string GetProduct() => "Product: Apple";
+}
+
+// Infrastructure Layer (Azure Function)
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using System.Threading.Tasks;
+
+public class ProductFunction
+{
+    private readonly IProductService _service = new ProductService();
+
+    [Function("GetProduct")]
+    public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
+    {
+        var response = req.CreateResponse();
+        response.WriteString(_service.GetProduct());
+        return response;
+    }
+}
+```
+
+## 14. API Gateway Pattern
+
+* **Definition:** Provides a single entry point for multiple backend services, centralizing API management.
+* **When to Use:** Use when you want to simplify client communication with multiple backend services.
+* **Similar Patterns to Learn:** Proxy, Service-Oriented Architecture.
+
+### Advantages:
+
+* Centralized API management.
+* Load balancing and routing.
+* Security (authentication, authorization).
+
+### Disadvantages:
+
+* Single point of failure (unless redundant).
+* Adds an extra layer of complexity.
+
+### Example: API Gateway in C\#
+
+```csharp
+// API Gateway
+public class ApiGateway
+{
+    private readonly ProductService _productService = new();
+    private readonly OrderService _orderService = new();
+
+    public void RouteRequest(string endpoint)
+    {
+        if (endpoint == "/products")
+            Console.WriteLine(_productService.GetProducts());
+        else if (endpoint == "/orders")
+            _orderService.CreateOrder();
+        else
+            Console.WriteLine("Invalid endpoint.");
+    }
+}
+
+// Services
+public class ProductService
+{
+    public string GetProducts() => "Product List: Apple, Banana";
+}
+
+public class OrderService
+{
+    public void CreateOrder() => Console.WriteLine("Order Created");
+}
+
+// Usage
+var gateway = new ApiGateway();
+gateway.RouteRequest("/products");
+gateway.RouteRequest("/orders");
+```
+
+## 15. Backend for Frontend (BFF) Pattern
+
+* **Definition:** Provides a dedicated backend for each frontend (e.g., mobile, web), optimizing API responses.
+* **When to Use:** Use when you need to tailor API responses for different client applications.
+* **Similar Patterns to Learn:** API Gateway, Microservices.
+
+### Advantages:
+
+* Optimized APIs for each frontend.
+* Decouples frontend and backend development.
+* Improved performance.
+
+### Disadvantages:
+
+* Increases code duplication.
+* More backend services to maintain.
+
+### Example: Backend for Frontend (BFF) in C\#
+
+```csharp
+// Mobile BFF
+public class MobileBFF
+{
+    public string GetProductDetails()
+    {
+        return "Mobile Product: Apple - Compact View";
+    }
+}
+
+// Web BFF
+public class WebBFF
+{
+    public string GetProductDetails()
+    {
+        return "Web Product: Apple - Full View with Description";
+    }
+}
+
+// Usage
+var mobileBff = new MobileBFF();
+Console.WriteLine(mobileBff.GetProductDetails());
+
+var webBff = new WebBFF();
+Console.WriteLine(webBff.GetProductDetails());
+```
+# Architecture Patterns 16-18: Full Details with Code
+
+## 16. Saga Pattern
+
+* **Definition:** Manages distributed transactions across multiple services using a series of local transactions and compensation actions.
+* **When to Use:** Use when you need to maintain consistency across distributed services without using a distributed transaction.
+* **Similar Patterns to Learn:** Event-Driven Architecture, CQRS.
+
+### Advantages:
+
+* Avoids distributed transactions.
+* Provides fault tolerance with compensation.
+* Scalable across services.
+
+### Disadvantages:
+
+* Complex coordination between services.
+* Error handling is challenging.
+
+### Example: Saga Pattern in C\#
+
+```csharp
+// Saga Orchestrator
+public class OrderSaga
+{
+    public void StartSaga()
+    {
+        try
+        {
+            CreateOrder();
+            ProcessPayment();
+            ShipOrder();
+        }
+        catch (Exception)
+        {
+            Compensate();
+        }
+    }
+
+    private void CreateOrder() => Console.WriteLine("Order Created");
+    private void ProcessPayment() => Console.WriteLine("Payment Processed");
+    private void ShipOrder() => Console.WriteLine("Order Shipped");
+
+    private void Compensate() => Console.WriteLine("Compensating Transaction");
+}
+
+// Usage
+var saga = new OrderSaga();
+saga.StartSaga();
+```
+
+## 17. Strangler Pattern
+
+* **Definition:** Gradually replaces an existing legacy system by building new functionality in parallel until the legacy system is completely replaced.
+* **When to Use:** Use when you want to safely migrate a legacy system to a modern architecture.
+* **Similar Patterns to Learn:** Modular Monolith, Microservices.
+
+### Advantages:
+
+* Safe, gradual migration.
+* Minimal downtime.
+* Continuous delivery of new features.
+
+### Disadvantages:
+
+* Requires maintaining two systems during migration.
+* Complex routing logic.
+
+### Example: Strangler Pattern in C\#
+
+```csharp
+// Legacy System
+public class LegacyOrderSystem
+{
+    public void PlaceOrder() => Console.WriteLine("Order Placed in Legacy System");
+}
+
+// Modern System
+public class ModernOrderSystem
+{
+    public void PlaceOrder() => Console.WriteLine("Order Placed in Modern System");
+}
+
+// Router (Strangler Switch)
+public class OrderRouter
+{
+    private readonly LegacyOrderSystem _legacy = new();
+    private readonly ModernOrderSystem _modern = new();
+
+    public void PlaceOrder(bool useModern)
+    {
+        if (useModern)
+            _modern.PlaceOrder();
+        else
+            _legacy.PlaceOrder();
+    }
+}
+
+// Usage
+var router = new OrderRouter();
+router.PlaceOrder(useModern: true);
+```
+
+## 18. Reactive Microservices Architecture
+
+* **Definition:** Builds microservices that respond to events in real-time using reactive principles (responsive, resilient, elastic, message-driven).
+* **When to Use:** Use when you need scalable, high-performance, and fault-tolerant services.
+* **Similar Patterns to Learn:** Event-Driven Architecture, Microservices.
+
+### Advantages:
+
+* High scalability and responsiveness.
+* Fault-tolerant with event-driven communication.
+
+### Disadvantages:
+
+* Debugging can be complex.
+* Requires careful design for consistency.
+
+### Example: Reactive Microservices in C\#
+
+```csharp
+// Reactive Event Publisher
+public class ReactiveEventPublisher
+{
+    public event Action<string> OnEvent;
+
+    public void Publish(string message) => OnEvent?.Invoke(message);
+}
+
+// Reactive Event Subscriber
+public class ReactiveSubscriber
+{
+    public void OnEventReceived(string message)
+    {
+        Console.WriteLine("Reactive Event Received: " + message);
+    }
+}
+
+// Usage
+var publisher = new ReactiveEventPublisher();
+var subscriber = new ReactiveSubscriber();
+publisher.OnEvent += subscriber.OnEventReceived;
+publisher.Publish("Order Placed");
+```
