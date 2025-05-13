@@ -361,7 +361,7 @@ public class OrderService
 
 * Use Observer Pattern when an object needs to notify multiple objects about state changes without tightly coupling them.
 
-# Mastering 20 Common Design Patterns in C\#
+# 50 Common Design Patterns in C\#
 
 ## Introduction
 
