@@ -302,8 +302,6 @@ public class OrderService
 
 ## Section 2: Design Patterns (10 Most Common)
 
-Each pattern will be explained with code, use cases, and best practices.
-
 1. Singleton
 2. Factory Method
 3. Abstract Factory
