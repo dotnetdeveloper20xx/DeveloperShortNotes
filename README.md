@@ -3541,17 +3541,17 @@ class Program
 * Making the template method public instead of protected, or making too many methods abstract without default behavior.
 
 
-## 22. Visitor Pattern
+## 22. Visitor Pattern in C# 
 
 ## Definition
 
-The Visitor Pattern is a behavioral design pattern that allows adding new behaviors to existing classes without modifying them. It achieves this by separating the behavior into a separate visitor object that can be applied to the target classes.
+The Visitor Pattern is a behavioral design pattern that allows adding new behaviors to existing classes without modifying them. It separates the behavior into a separate visitor object that can be applied to the target classes.
 
 ## When to Use
 
 * When you need to add new operations to a class hierarchy without modifying the existing classes.
 * When you want to separate the logic for performing operations from the object structure.
-* When you have a complex object structure with many related classes and you want to perform operations on them without altering their definitions.
+* When you have a complex object structure with many related classes and want to perform operations on them without altering their definitions.
 
 ## Key Components
 
@@ -3562,7 +3562,7 @@ The Visitor Pattern is a behavioral design pattern that allows adding new behavi
 
 ## Real-World Analogy
 
-Imagine a museum where a guide can provide different types of information to different visitors (children, adults, researchers). The guide has a different approach for each type of visitor, but the museum exhibits themselves do not change.
+Imagine a shopping cart in an e-commerce system. The cart can contain different types of products (Books, Electronics), each with unique discount rules. A DiscountVisitor can calculate discounts for each product without the cart needing to know the discount logic.
 
 ## Full Code Example
 
@@ -3571,20 +3571,20 @@ Imagine a museum where a guide can provide different types of information to dif
 public interface IVisitor
 {
     void Visit(Book book);
-    void Visit(Magazine magazine);
+    void Visit(Electronic electronic);
 }
 
 // Concrete Visitor
-public class PriceCalculatorVisitor : IVisitor
+public class DiscountVisitor : IVisitor
 {
     public void Visit(Book book)
     {
-        Console.WriteLine($"Book: {book.Title}, Price: {book.Price * 0.9}");
+        Console.WriteLine($"Book: {book.Title}, Discounted Price: {book.Price * 0.9}");
     }
 
-    public void Visit(Magazine magazine)
+    public void Visit(Electronic electronic)
     {
-        Console.WriteLine($"Magazine: {magazine.Title}, Price: {magazine.Price * 0.8}");
+        Console.WriteLine($"Electronic: {electronic.Name}, Discounted Price: {electronic.Price * 0.8}");
     }
 }
 
@@ -3606,9 +3606,9 @@ public class Book : IVisitable
     }
 }
 
-public class Magazine : IVisitable
+public class Electronic : IVisitable
 {
-    public string Title { get; set; }
+    public string Name { get; set; }
     public double Price { get; set; }
 
     public void Accept(IVisitor visitor)
@@ -3625,14 +3625,14 @@ class Program
         List<IVisitable> items = new List<IVisitable>
         {
             new Book { Title = "C# Mastery", Price = 30 },
-            new Magazine { Title = "Tech World", Price = 15 }
+            new Electronic { Name = "Laptop", Price = 1000 }
         };
 
-        IVisitor priceCalculator = new PriceCalculatorVisitor();
+        IVisitor discountVisitor = new DiscountVisitor();
 
         foreach (var item in items)
         {
-            item.Accept(priceCalculator);
+            item.Accept(discountVisitor);
         }
     }
 }
@@ -3664,7 +3664,7 @@ class Program
 
 2. **How does Visitor Pattern differ from Strategy Pattern?**
 
-   * Visitor allows adding new operations to existing classes, while Strategy allows switching between algorithms dynamically.
+   * Visitor adds new operations to existing classes, while Strategy allows switching between algorithms.
 
 3. **What are the key components of the Visitor Pattern?**
 
@@ -3672,29 +3672,29 @@ class Program
 
 4. **Can you provide a real-world example of Visitor Pattern?**
 
-   * A museum guide providing different types of information to different visitors.
+   * A shopping cart system where different types of products receive different discounts via a DiscountVisitor.
 
 5. **How does Visitor Pattern support the Open/Closed Principle?**
 
    * New behaviors can be added via new visitor classes without modifying existing elements.
 
-6. **Can you use Visitor Pattern without an interface for the visitor?**
-
-   * It is best practice to use an interface to maintain flexibility.
-
-7. **What is the main disadvantage of Visitor Pattern?**
+6. **What is a downside of Visitor Pattern?**
 
    * It can be difficult to maintain if the object structure frequently changes.
+
+7. **Can you use Visitor Pattern without an interface for the visitor?**
+
+   * It is best practice to use an interface to maintain flexibility.
 
 8. **How do you add a new operation using Visitor Pattern?**
 
    * By creating a new visitor class that implements the visitor interface.
 
-9. **What are the common mistakes in using Visitor Pattern?**
+9. **How do you ensure flexibility in Visitor Pattern?**
 
-   * Tight coupling between visitor and concrete elements, and not maintaining the visitor interface.
+   * By keeping the visitor interface independent of the concrete elements.
 
-10. **Can the Visitor Pattern be used with unrelated classes?**
+10. **Can Visitor Pattern be used with unrelated classes?**
 
 * Yes, but it is most effective with a well-defined object hierarchy.
 
