@@ -3560,6 +3560,18 @@ The Visitor Pattern is a behavioral design pattern that allows adding new behavi
 3. **Element Interface**: Declares an accept method that takes a visitor.
 4. **Concrete Elements**: Implement the accept method, passing themselves to the visitor.
 
+**Visitor Interface**
+ Think of this as a guidebook that lists all the types of things the visitor can see. It provides instructions (methods) for how the visitor should interact with each type of object.
+
+**Concrete Visitor:**
+This is the actual visitor who follows the guidebook's instructions. It knows how to perform specific actions on the different types of objects it can visit.
+
+**Element Interface:**
+This is like a ticket counter. It ensures that every object can accept a visitor. Each object must have a way to allow the visitor in (a method called "accept").
+
+**Concrete Elements:**
+These are the actual objects that the visitor can interact with (like books, electronics, or groceries). They welcome the visitor and let it perform actions on them.
+
 ## Real-World Analogy
 
 Imagine a shopping cart in an e-commerce system. The cart can contain different types of products (Books, Electronics), each with unique discount rules. A DiscountVisitor can calculate discounts for each product without the cart needing to know the discount logic.
@@ -4169,8 +4181,6 @@ class Program
 * Yes, but you must ensure thread safety with synchronization methods (like `SemaphoreSlim`).
 
 ## 30. Lazy Initialization Pattern
-
-# Lazy Initialization Pattern in C# - Master Guide
 
 ## Definition
 
