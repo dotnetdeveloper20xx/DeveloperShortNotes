@@ -3396,334 +3396,1067 @@ class Program
 
 ## 21. Template Method Pattern
 
-* **Definition:** Defines the skeleton of an algorithm in a base class but lets subclasses override specific steps without changing the algorithm’s structure.
-* **When to Use:** Use when you have an algorithm with common steps, but some steps may vary.
-* **Similar Patterns to Learn:** Strategy, State.
+## Definition
+
+The Template Method Pattern is a behavioral design pattern that defines the skeleton of an algorithm in a base class but allows subclasses to override specific steps without changing the overall structure.
+
+## When to Use
+
+* When you have a common process with specific steps that may vary in subclasses.
+* When you want to enforce a consistent algorithm structure but allow customization for certain steps.
+* When you need code reusability across different but similar tasks.
+
+## Key Components
+
+1. **Abstract Class**: Defines the skeleton of the algorithm with one or more abstract methods that subclasses must implement.
+2. **Concrete Subclasses**: Implement the abstract methods to provide specific behavior.
+
+## Real-World Analogy
+
+Imagine a restaurant cooking process. The general steps for preparing a dish (preparing ingredients, cooking, and serving) are the same. However, each dish has specific ingredients and cooking methods that vary. The restaurant defines the general cooking process (template), but chefs (subclasses) customize the details for each dish.
+
+## Full Code Example
 
 ```csharp
-public abstract class DataProcessor
+// Abstract Class - Template
+public abstract class MealPreparation
 {
-    public void ProcessData()
+    // Template Method
+    public void PrepareMeal()
     {
-        LoadData();
-        ProcessDataInternal();
-        SaveData();
+        PrepareIngredients();
+        Cook();
+        Serve();
     }
 
-    protected abstract void LoadData();
-    protected abstract void ProcessDataInternal();
+    protected abstract void PrepareIngredients();
+    protected abstract void Cook();
 
-    protected virtual void SaveData() => Console.WriteLine("Data saved.");
+    protected virtual void Serve()
+    {
+        Console.WriteLine("Serving the dish.");
+    }
 }
 
-public class CsvProcessor : DataProcessor
+// Concrete Subclass - Pasta
+public class PastaMeal : MealPreparation
 {
-    protected override void LoadData() => Console.WriteLine("CSV data loaded.");
+    protected override void PrepareIngredients()
+    {
+        Console.WriteLine("Preparing pasta, sauce, and spices.");
+    }
 
-    protected override void ProcessDataInternal() => Console.WriteLine("Processing CSV data.");
+    protected override void Cook()
+    {
+        Console.WriteLine("Cooking pasta and mixing with sauce.");
+    }
 }
 
-public class JsonProcessor : DataProcessor
+// Concrete Subclass - Salad
+public class SaladMeal : MealPreparation
 {
-    protected override void LoadData() => Console.WriteLine("JSON data loaded.");
+    protected override void PrepareIngredients()
+    {
+        Console.WriteLine("Chopping vegetables and preparing dressing.");
+    }
 
-    protected override void ProcessDataInternal() => Console.WriteLine("Processing JSON data.");
+    protected override void Cook()
+    {
+        Console.WriteLine("Mixing vegetables with dressing.");
+    }
+}
+
+// Usage
+class Program
+{
+    static void Main()
+    {
+        MealPreparation pasta = new PastaMeal();
+        pasta.PrepareMeal();
+
+        MealPreparation salad = new SaladMeal();
+        salad.PrepareMeal();
+    }
 }
 ```
 
+## Benefits
+
+* Promotes code reusability by defining a general structure in the base class.
+* Allows subclasses to customize specific steps of the process.
+* Follows the Open/Closed Principle (subclasses can extend without modifying base class).
+
+## Similar Patterns to Learn
+
+* Strategy Pattern
+* Factory Method Pattern
+* Command Pattern
+
+## Common Mistakes
+
+* Overusing the Template Method Pattern when the algorithm steps do not have a consistent structure.
+* Making too many steps abstract, leading to code duplication in subclasses.
+* Not making base class methods properly protected (instead of public).
+
+## 10 Interview Questions with Answers
+
+1. **What is the Template Method Pattern in C#?**
+
+   * It is a behavioral design pattern that defines a template (skeleton) of an algorithm in an abstract class and allows subclasses to implement specific steps.
+
+2. **How does Template Method differ from Strategy Pattern?**
+
+   * Template Method provides a fixed structure with customizable steps, while Strategy allows full algorithm swapping.
+
+3. **What are the key components of the Template Method Pattern?**
+
+   * Abstract Class (Template) and Concrete Subclasses.
+
+4. **Can the Template Method Pattern be implemented without abstract classes?**
+
+   * No, it requires an abstract base class to define the general structure.
+
+5. **What is the role of a `virtual` method in Template Method Pattern?**
+
+   * It allows a default implementation that can be overridden in subclasses.
+
+6. **How does Template Method promote code reuse?**
+
+   * By defining the algorithm’s structure in one place (base class) and allowing customization in subclasses.
+
+7. **Can you make the Template Method private?**
+
+   * No, it should be public or protected to allow external usage.
+
+8. **What is a hook method in Template Method Pattern?**
+
+   * A hook is a method with a default (usually empty) implementation that subclasses can optionally override.
+
+9. **Is Template Method a behavioral design pattern? Why?**
+
+   * Yes, because it defines the behavior of an algorithm with a consistent structure.
+
+10. **What are the common mistakes in implementing Template Method Pattern?**
+
+* Making the template method public instead of protected, or making too many methods abstract without default behavior.
+
+
 ## 22. Visitor Pattern
 
-* **Definition:** Allows you to add further operations to objects without modifying their classes.
-* **When to Use:** Use when you need to perform different operations on objects of different classes without modifying them.
-* **Similar Patterns to Learn:** Composite, Iterator.
+## Definition
+
+The Visitor Pattern is a behavioral design pattern that allows adding new behaviors to existing classes without modifying them. It achieves this by separating the behavior into a separate visitor object that can be applied to the target classes.
+
+## When to Use
+
+* When you need to add new operations to a class hierarchy without modifying the existing classes.
+* When you want to separate the logic for performing operations from the object structure.
+* When you have a complex object structure with many related classes and you want to perform operations on them without altering their definitions.
+
+## Key Components
+
+1. **Visitor Interface**: Defines a visit method for each type of concrete element.
+2. **Concrete Visitor**: Implements the visit methods for specific operations.
+3. **Element Interface**: Declares an accept method that takes a visitor.
+4. **Concrete Elements**: Implement the accept method, passing themselves to the visitor.
+
+## Real-World Analogy
+
+Imagine a museum where a guide can provide different types of information to different visitors (children, adults, researchers). The guide has a different approach for each type of visitor, but the museum exhibits themselves do not change.
+
+## Full Code Example
 
 ```csharp
-public interface IElement
+// Visitor Interface
+public interface IVisitor
+{
+    void Visit(Book book);
+    void Visit(Magazine magazine);
+}
+
+// Concrete Visitor
+public class PriceCalculatorVisitor : IVisitor
+{
+    public void Visit(Book book)
+    {
+        Console.WriteLine($"Book: {book.Title}, Price: {book.Price * 0.9}");
+    }
+
+    public void Visit(Magazine magazine)
+    {
+        Console.WriteLine($"Magazine: {magazine.Title}, Price: {magazine.Price * 0.8}");
+    }
+}
+
+// Element Interface
+public interface IVisitable
 {
     void Accept(IVisitor visitor);
 }
 
-public class Document : IElement
+// Concrete Elements
+public class Book : IVisitable
 {
-    public void Accept(IVisitor visitor) => visitor.Visit(this);
+    public string Title { get; set; }
+    public double Price { get; set; }
+
+    public void Accept(IVisitor visitor)
+    {
+        visitor.Visit(this);
+    }
 }
 
-public class Image : IElement
+public class Magazine : IVisitable
 {
-    public void Accept(IVisitor visitor) => visitor.Visit(this);
+    public string Title { get; set; }
+    public double Price { get; set; }
+
+    public void Accept(IVisitor visitor)
+    {
+        visitor.Visit(this);
+    }
 }
 
-public interface IVisitor
+// Usage
+class Program
 {
-    void Visit(Document document);
-    void Visit(Image image);
-}
+    static void Main()
+    {
+        List<IVisitable> items = new List<IVisitable>
+        {
+            new Book { Title = "C# Mastery", Price = 30 },
+            new Magazine { Title = "Tech World", Price = 15 }
+        };
 
-public class PrintVisitor : IVisitor
-{
-    public void Visit(Document document) => Console.WriteLine("Printing document.");
-    public void Visit(Image image) => Console.WriteLine("Printing image.");
+        IVisitor priceCalculator = new PriceCalculatorVisitor();
+
+        foreach (var item in items)
+        {
+            item.Accept(priceCalculator);
+        }
+    }
 }
 ```
 
+## Benefits
+
+* Follows the Open/Closed Principle, allowing new operations without modifying existing classes.
+* Separates the algorithm (visitor) from the data structure (elements).
+* Makes it easy to add new behaviors for complex object hierarchies.
+
+## Similar Patterns to Learn
+
+* Strategy Pattern
+* Composite Pattern
+* Command Pattern
+
+## Common Mistakes
+
+* Making the visitor too tightly coupled to the concrete elements.
+* Forgetting to implement the accept method in the element classes.
+* Not defining all required visit methods in the visitor interface.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Visitor Pattern in C#?**
+
+   * It is a behavioral design pattern that allows adding new behaviors to existing classes without modifying them.
+
+2. **How does Visitor Pattern differ from Strategy Pattern?**
+
+   * Visitor allows adding new operations to existing classes, while Strategy allows switching between algorithms dynamically.
+
+3. **What are the key components of the Visitor Pattern?**
+
+   * Visitor Interface, Concrete Visitor, Element Interface, and Concrete Elements.
+
+4. **Can you provide a real-world example of Visitor Pattern?**
+
+   * A museum guide providing different types of information to different visitors.
+
+5. **How does Visitor Pattern support the Open/Closed Principle?**
+
+   * New behaviors can be added via new visitor classes without modifying existing elements.
+
+6. **Can you use Visitor Pattern without an interface for the visitor?**
+
+   * It is best practice to use an interface to maintain flexibility.
+
+7. **What is the main disadvantage of Visitor Pattern?**
+
+   * It can be difficult to maintain if the object structure frequently changes.
+
+8. **How do you add a new operation using Visitor Pattern?**
+
+   * By creating a new visitor class that implements the visitor interface.
+
+9. **What are the common mistakes in using Visitor Pattern?**
+
+   * Tight coupling between visitor and concrete elements, and not maintaining the visitor interface.
+
+10. **Can the Visitor Pattern be used with unrelated classes?**
+
+* Yes, but it is most effective with a well-defined object hierarchy.
+
+
 ## 23. Iterator Pattern
 
-* **Definition:** Provides a way to access the elements of a collection sequentially without exposing the underlying structure.
-* **When to Use:** Use when you need to iterate over a collection without exposing its implementation.
-* **Similar Patterns to Learn:** Composite, Visitor.
+## Definition
+
+The Iterator Pattern is a behavioral design pattern that provides a way to access the elements of a collection sequentially without exposing its underlying structure.
+
+## When to Use
+
+* When you need to traverse a collection without exposing its internal structure.
+* When you have different types of collections and want a uniform way to traverse them.
+* When you want to provide multiple traversal options (forward, backward, filtered, etc.).
+
+## Key Components
+
+1. **Iterator Interface**: Defines the methods for accessing the elements in the collection.
+2. **Concrete Iterator**: Implements the iterator interface for a specific collection.
+3. **Aggregate Interface (Collection)**: Declares a method to create an iterator.
+4. **Concrete Aggregate (Concrete Collection)**: Implements the aggregate interface and returns a concrete iterator.
+
+## Real-World Analogy
+
+Imagine a playlist in a music player. The playlist is a collection of songs, and the user can navigate through the songs sequentially (next, previous). The iterator here is the navigation control, which allows the user to access the songs without directly modifying the playlist.
+
+## Full Code Example
 
 ```csharp
+// Iterator Interface
 public interface IIterator<T>
 {
     bool HasNext();
     T Next();
 }
 
-public class ListIterator<T> : IIterator<T>
+// Concrete Iterator
+public class BookIterator : IIterator<string>
 {
-    private readonly List<T> _collection;
-    private int _currentIndex = 0;
+    private readonly List<string> _books;
+    private int _position = 0;
 
-    public ListIterator(List<T> collection) => _collection = collection;
-
-    public bool HasNext() => _currentIndex < _collection.Count;
-
-    public T Next() => _collection[_currentIndex++];
-}
-```
-
-## 24. Chain of Responsibility Pattern (Advanced)
-
-* **Definition:** Passes a request along a chain of handlers where each handler decides whether to handle the request.
-* **When to Use:** Use when multiple handlers may process a request, and the handler isn't predetermined.
-* **Similar Patterns to Learn:** Command, Mediator.
-
-```csharp
-public abstract class AdvancedHandler
-{
-    protected AdvancedHandler Next;
-
-    public void SetNext(AdvancedHandler next) => Next = next;
-
-    public abstract void HandleRequest(string request);
-}
-
-public class LoggingHandler : AdvancedHandler
-{
-    public override void HandleRequest(string request)
+    public BookIterator(List<string> books)
     {
-        Console.WriteLine("Logging request.");
-        Next?.HandleRequest(request);
+        _books = books;
+    }
+
+    public bool HasNext()
+    {
+        return _position < _books.Count;
+    }
+
+    public string Next()
+    {
+        return HasNext() ? _books[_position++] : null;
     }
 }
 
-public class AuthenticationHandler : AdvancedHandler
+// Aggregate Interface
+public interface IBookCollection
 {
-    public override void HandleRequest(string request)
+    IIterator<string> CreateIterator();
+}
+
+// Concrete Aggregate
+public class BookCollection : IBookCollection
+{
+    private List<string> _books = new List<string>();
+
+    public void AddBook(string book)
     {
-        Console.WriteLine("Authenticating request.");
-        Next?.HandleRequest(request);
-    }
-}
-```
-
-## 25. Null Object Pattern
-
-* **Definition:** Provides a default behavior for absent or null objects.
-* **When to Use:** Use when you want to avoid null checks by providing a default implementation.
-* **Similar Patterns to Learn:** Strategy, Singleton.
-
-```csharp
-public interface ICustomer
-{
-    void Purchase();
-}
-
-public class RealCustomer : ICustomer
-{
-    public void Purchase() => Console.WriteLine("Customer made a purchase.");
-}
-
-public class NullCustomer : ICustomer
-{
-    public void Purchase() => Console.WriteLine("No customer to process.");
-}
-```
-# Design Patterns 26-30: Full Details with Code
-
-## 26. Singleton (Thread-Safe, Lazy Initialization)
-
-* **Definition:** Ensures a class has only one instance, with thread-safe lazy initialization.
-* **When to Use:** Use when you need a single instance of a class, and it must be created only when needed.
-* **Similar Patterns to Learn:** Simple Singleton, Factory Method.
-
-```csharp
-public sealed class ThreadSafeSingleton
-{
-    private static readonly Lazy<ThreadSafeSingleton> _instance = new Lazy<ThreadSafeSingleton>(() => new ThreadSafeSingleton());
-
-    private ThreadSafeSingleton() { }
-
-    public static ThreadSafeSingleton Instance => _instance.Value;
-}
-```
-
-## 27. Static Factory Pattern
-
-* **Definition:** Provides a static method to create and return instances of classes.
-* **When to Use:** Use when you want to centralize object creation without exposing constructors.
-* **Similar Patterns to Learn:** Factory Method, Abstract Factory.
-
-```csharp
-public class User
-{
-    public string Name { get; private set; }
-
-    private User(string name)
-    {
-        Name = name;
+        _books.Add(book);
     }
 
-    public static User CreateAdmin(string name) => new User(name + " (Admin)");
-
-    public static User CreateGuest() => new User("Guest");
-}
-```
-
-## 28. Prototype Pattern (Deep Clone)
-
-* **Definition:** Creates a copy of an existing object, including deep copy of its fields.
-* **When to Use:** Use when cloning complex objects with nested references.
-* **Similar Patterns to Learn:** Shallow Prototype, Builder.
-
-```csharp
-[Serializable]
-public class DeepClonePrototype
-{
-    public string Name { get; set; }
-    public List<string> Items { get; set; } = new();
-
-    public DeepClonePrototype DeepClone()
+    public IIterator<string> CreateIterator()
     {
-        using (var stream = new MemoryStream())
+        return new BookIterator(_books);
+    }
+}
+
+// Usage
+class Program
+{
+    static void Main()
+    {
+        BookCollection bookCollection = new BookCollection();
+        bookCollection.AddBook("C# Mastery");
+        bookCollection.AddBook("Design Patterns in C#");
+        bookCollection.AddBook("Advanced .NET Programming");
+
+        IIterator<string> iterator = bookCollection.CreateIterator();
+
+        while (iterator.HasNext())
         {
-            var formatter = new BinaryFormatter();
-            formatter.Serialize(stream, this);
-            stream.Seek(0, SeekOrigin.Begin);
-            return (DeepClonePrototype)formatter.Deserialize(stream);
+            Console.WriteLine(iterator.Next());
         }
     }
 }
 ```
 
-## 29. Object Pool Pattern
+## Benefits
 
-* **Definition:** Manages a pool of reusable objects, reducing the overhead of object creation.
-* **When to Use:** Use when objects are expensive to create, but can be reused.
-* **Similar Patterns to Learn:** Factory Method, Singleton.
+* Provides a consistent way to traverse different types of collections.
+* Allows multiple iterators for the same collection (e.g., forward, backward).
+* Encapsulates the traversal logic outside of the collection class.
+
+## Similar Patterns to Learn
+
+* Composite Pattern
+* Visitor Pattern
+* Strategy Pattern
+
+## Common Mistakes
+
+* Exposing the internal structure of the collection directly.
+* Not properly resetting the iterator position for a new iteration.
+* Creating multiple iterators without understanding their independent state.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Iterator Pattern in C#?**
+
+   * It is a behavioral design pattern that provides a way to sequentially access the elements of a collection without exposing its underlying structure.
+
+2. **What are the key components of the Iterator Pattern?**
+
+   * Iterator Interface, Concrete Iterator, Aggregate Interface, and Concrete Aggregate.
+
+3. **How does Iterator Pattern differ from the Enumerator in C#?**
+
+   * The Iterator Pattern is a design pattern that can be customized for different collections, while an Enumerator is a built-in C# feature for iterating collections.
+
+4. **Can you provide a real-world example of Iterator Pattern?**
+
+   * A music playlist that allows users to navigate through songs sequentially.
+
+5. **What is the role of the Aggregate Interface in Iterator Pattern?**
+
+   * It defines a method for creating an iterator for the collection.
+
+6. **How does Iterator Pattern promote the Open/Closed Principle?**
+
+   * New iterators can be added without modifying the collection classes.
+
+7. **Can you implement multiple iterators for a single collection?**
+
+   * Yes, you can implement different iterators (e.g., forward, backward, filtered).
+
+8. **What is a Concrete Iterator?**
+
+   * It is a specific implementation of the iterator interface for a particular collection.
+
+9. **What is the advantage of using an Iterator Pattern over a for loop?**
+
+   * The iterator can abstract the traversal logic, making it flexible and decoupled from the collection.
+
+10. **How do you reset an iterator to the starting position?**
+
+* Typically by re-instantiating the iterator or providing a Reset method.
+
+## 25. Null Object Pattern
+
+## Definition
+
+The Null Object Pattern is a behavioral design pattern that provides a default object as a substitute for a null reference. This object can be used without requiring special handling for null values, avoiding null checks throughout the code.
+
+## When to Use
+
+* When you want to avoid frequent null checks in your code.
+* When a default or do-nothing behavior makes sense for an absent object.
+* When you want a clean, consistent way to handle missing or absent data.
+
+## Key Components
+
+1. **Abstract Base Class or Interface**: Defines the expected behavior for the object.
+2. **Concrete Implementation**: Implements the base class or interface with actual behavior.
+3. **Null Object**: A specific implementation of the base class that provides default or do-nothing behavior.
+
+## Real-World Analogy
+
+Imagine a customer support system where a customer can either be a registered customer with detailed information or a guest. If a customer record is not found, instead of returning null, a "GuestCustomer" object is returned, providing a default behavior.
+
+## Full Code Example
 
 ```csharp
-public class Connection
+// Customer Interface
+public interface ICustomer
 {
-    public void Connect() => Console.WriteLine("Connected.");
+    string GetCustomerDetails();
 }
 
-public class ConnectionPool
+// Real Customer Class
+public class RealCustomer : ICustomer
 {
-    private readonly Queue<Connection> _pool = new();
+    private string _name;
 
-    public Connection GetConnection()
+    public RealCustomer(string name)
     {
-        return _pool.Count > 0 ? _pool.Dequeue() : new Connection();
+        _name = name;
     }
 
-    public void ReturnConnection(Connection conn)
+    public string GetCustomerDetails()
     {
-        _pool.Enqueue(conn);
+        return $"Customer Name: {_name}";
+    }
+}
+
+// Null Customer Class (Null Object)
+public class NullCustomer : ICustomer
+{
+    public string GetCustomerDetails()
+    {
+        return "Guest Customer - No Details Available";
+    }
+}
+
+// Customer Factory
+public class CustomerFactory
+{
+    private static readonly List<string> registeredCustomers = new List<string> { "John", "Jane", "Alice" };
+
+    public static ICustomer GetCustomer(string name)
+    {
+        if (registeredCustomers.Contains(name))
+        {
+            return new RealCustomer(name);
+        }
+        return new NullCustomer();
+    }
+}
+
+// Usage
+class Program
+{
+    static void Main()
+    {
+        ICustomer customer1 = CustomerFactory.GetCustomer("John");
+        ICustomer customer2 = CustomerFactory.GetCustomer("David");
+
+        Console.WriteLine(customer1.GetCustomerDetails()); // Output: Customer Name: John
+        Console.WriteLine(customer2.GetCustomerDetails()); // Output: Guest Customer - No Details Available
     }
 }
 ```
+
+## Benefits
+
+* Eliminates the need for frequent null checks.
+* Provides a default behavior without altering the main logic.
+* Follows the Open/Closed Principle (new null objects can be added without modifying existing code).
+
+## Similar Patterns to Learn
+
+* Strategy Pattern
+* State Pattern
+* Factory Pattern
+
+## Common Mistakes
+
+* Creating a complex null object with too many behaviors.
+* Forgetting to use the null object consistently, leading to null reference exceptions.
+* Not making the null object conform to the same interface as the real objects.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Null Object Pattern in C#?**
+
+   * It is a behavioral design pattern that uses a default object as a substitute for a null reference, avoiding null checks in code.
+
+2. **How does the Null Object Pattern differ from a simple null check?**
+
+   * It provides a default object with predefined behavior instead of just checking for null.
+
+3. **What are the key components of the Null Object Pattern?**
+
+   * An interface or abstract base class, a concrete implementation, and a null object implementation.
+
+4. **Can the Null Object Pattern be used with value types?**
+
+   * No, it is primarily used with reference types.
+
+5. **What are the advantages of using the Null Object Pattern?**
+
+   * It simplifies code by avoiding null checks and provides consistent behavior.
+
+6. **Can you have multiple Null Objects for a single interface?**
+
+   * Yes, as long as they provide different default behaviors.
+
+7. **How does the Null Object Pattern follow the Open/Closed Principle?**
+
+   * New null objects can be added without modifying existing code.
+
+8. **What is the difference between Null Object Pattern and Default Object Pattern?**
+
+   * Null Object provides do-nothing behavior, while Default Object provides meaningful default behavior.
+
+9. **When should you avoid using the Null Object Pattern?**
+
+   * When the default behavior is complex or misleading.
+
+10. **How do you test a Null Object implementation?**
+
+* By asserting that it provides the expected default behavior without any exceptions.
+
+
+## 29. Object Pool Pattern
+
+## Definition
+
+The Object Pool Pattern is a creational design pattern that allows for the reuse of objects that are expensive to create, instead of creating and destroying them repeatedly. It maintains a pool of reusable objects, minimizing the overhead of object creation and destruction.
+
+## When to Use
+
+* When object creation is expensive in terms of time or resources.
+* When you want to manage the number of active objects in an application.
+* When the objects can be reused without significant modification.
+
+## Key Components
+
+1. **Object Pool**: Manages the pool of reusable objects, providing access and tracking which objects are in use.
+2. **Reusable Object**: The object type that will be managed in the pool.
+3. **Client**: The code that requests an object from the pool, uses it, and returns it.
+
+## Real-World Analogy
+
+Imagine a car rental service. Instead of buying a new car every time a customer arrives, the service has a pool of cars. Customers can rent (acquire) a car from the pool, use it, and return it. The car is then cleaned and prepared for the next customer (reset).
+
+## Full Code Example
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+// Reusable Object
+public class DatabaseConnection
+{
+    public int Id { get; private set; }
+
+    public DatabaseConnection(int id)
+    {
+        Id = id;
+    }
+
+    public void Connect()
+    {
+        Console.WriteLine($"DatabaseConnection {Id} connected.");
+    }
+
+    public void Disconnect()
+    {
+        Console.WriteLine($"DatabaseConnection {Id} disconnected.");
+    }
+}
+
+// Object Pool
+public class ConnectionPool
+{
+    private readonly List<DatabaseConnection> _availableConnections = new List<DatabaseConnection>();
+    private readonly List<DatabaseConnection> _usedConnections = new List<DatabaseConnection>();
+    private readonly int _maxConnections = 5;
+
+    public ConnectionPool()
+    {
+        for (int i = 0; i < _maxConnections; i++)
+        {
+            _availableConnections.Add(new DatabaseConnection(i + 1));
+        }
+    }
+
+    public DatabaseConnection Acquire()
+    {
+        if (_availableConnections.Count > 0)
+        {
+            var connection = _availableConnections[0];
+            _usedConnections.Add(connection);
+            _availableConnections.RemoveAt(0);
+            connection.Connect();
+            return connection;
+        }
+
+        throw new InvalidOperationException("No available connections.");
+    }
+
+    public void Release(DatabaseConnection connection)
+    {
+        if (_usedConnections.Remove(connection))
+        {
+            connection.Disconnect();
+            _availableConnections.Add(connection);
+        }
+    }
+}
+
+// Usage
+class Program
+{
+    static void Main()
+    {
+        ConnectionPool pool = new ConnectionPool();
+
+        var conn1 = pool.Acquire();
+        var conn2 = pool.Acquire();
+
+        pool.Release(conn1);
+        pool.Release(conn2);
+
+        var conn3 = pool.Acquire(); // Reuses released connection
+    }
+}
+```
+
+## Benefits
+
+* Reduces the cost of object creation and destruction.
+* Controls the number of active objects, which is useful for resource management.
+* Improves performance for high-frequency operations.
+
+## Similar Patterns to Learn
+
+* Singleton Pattern
+* Factory Pattern
+* Flyweight Pattern
+
+## Common Mistakes
+
+* Not properly managing the pool, leading to memory leaks (objects not released).
+* Allowing objects in the pool to maintain state between uses, causing unexpected behavior.
+* Creating too many objects in the pool, leading to memory overhead.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Object Pool Pattern in C#?**
+
+   * It is a creational design pattern that maintains a pool of reusable objects, avoiding the overhead of object creation and destruction.
+
+2. **How does Object Pool Pattern differ from Singleton Pattern?**
+
+   * Object Pool allows multiple reusable objects, while Singleton ensures only one instance exists.
+
+3. **What are the key components of the Object Pool Pattern?**
+
+   * Object Pool, Reusable Object, and Client.
+
+4. **Can you provide a real-world example of Object Pool Pattern?**
+
+   * A car rental service where customers rent cars from a pool instead of creating new cars.
+
+5. **What are the main benefits of using Object Pool Pattern?**
+
+   * Reduced object creation cost, better resource management, and improved performance.
+
+6. **How do you ensure thread safety in an Object Pool?**
+
+   * By using thread-safe collections like `ConcurrentBag` or using lock mechanisms.
+
+7. **What is the difference between Object Pool and Flyweight Pattern?**
+
+   * Object Pool reuses complete objects, while Flyweight shares parts of an object’s state among many objects.
+
+8. **What is the main disadvantage of using Object Pool Pattern?**
+
+   * Memory overhead if the pool size is too large, and potential memory leaks if objects are not released.
+
+9. **How do you initialize an Object Pool with a specific size?**
+
+   * By creating a predefined number of objects in the pool during initialization.
+
+10. **Can the Object Pool Pattern be used with asynchronous operations?**
+
+* Yes, but you must ensure thread safety with synchronization methods (like `SemaphoreSlim`).
 
 ## 30. Lazy Initialization Pattern
 
-* **Definition:** Defers object creation until it is actually needed, improving performance.
-* **When to Use:** Use when creating an object is resource-intensive, and it may not always be needed.
-* **Similar Patterns to Learn:** Singleton, Factory Method.
+# Lazy Initialization Pattern in C# - Master Guide
+
+## Definition
+
+The Lazy Initialization Pattern is a creational design pattern that defers the creation of an object until it is actually needed. This helps optimize performance by avoiding the creation of resource-intensive objects unless they are used.
+
+## When to Use
+
+* When object creation is expensive (in terms of time or memory) and may not always be needed.
+* When you want to optimize resource usage in an application.
+* When you want to delay expensive calculations or object creation until the value is actually required.
+
+## Key Components
+
+1. **Lazy Object or Value**: The object or value that is initialized only when it is accessed.
+2. **Lazy Wrapper**: A mechanism (such as `Lazy<T>`) that defers the object creation.
+3. **Thread-Safe Initialization**: Ensures that the object is created only once, even in multithreaded scenarios.
+
+## Real-World Analogy
+
+Imagine a hotel room that is not prepared until a guest checks in. This saves resources because empty rooms do not need to be cleaned or maintained until they are used.
+
+## Full Code Example
 
 ```csharp
-public class HeavyObject
-{
-    private Lazy<string> _data = new(() => LoadData());
+using System;
 
-    private static string LoadData()
+// Class representing an expensive resource
+public class ExpensiveResource
+{
+    public ExpensiveResource()
     {
-        Console.WriteLine("Loading heavy data...");
-        return "Heavy Data Loaded";
+        Console.WriteLine("Expensive Resource Created.");
     }
 
-    public string GetData() => _data.Value;
+    public void UseResource()
+    {
+        Console.WriteLine("Resource in use.");
+    }
+}
+
+// Usage with Lazy Initialization
+class Program
+{
+    static void Main()
+    {
+        // Lazy initialization using Lazy<T>
+        Lazy<ExpensiveResource> lazyResource = new Lazy<ExpensiveResource>();
+
+        Console.WriteLine("Program started.");
+
+        // Resource is only created when accessed
+        lazyResource.Value.UseResource();
+
+        // Resource is not created again
+        lazyResource.Value.UseResource();
+    }
 }
 ```
-# Design Patterns 31-35: Full Details with Code
 
-## 31. Dependency Injection Pattern
+### Output:
 
-* **Definition:** A technique where an object receives its dependencies from an external source rather than creating them internally.
-* **When to Use:** Use when you want to promote loose coupling and make code testable.
-* **Similar Patterns to Learn:** Inversion of Control, Service Locator.
-
-```csharp
-public interface ILogger
-{
-    void Log(string message);
-}
-
-public class ConsoleLogger : ILogger
-{
-    public void Log(string message) => Console.WriteLine(message);
-}
-
-public class OrderService
-{
-    private readonly ILogger _logger;
-
-    public OrderService(ILogger logger)
-    {
-        _logger = logger;
-    }
-
-    public void ProcessOrder()
-    {
-        _logger.Log("Order processed.");
-    }
-}
-
-// Usage
-var service = new OrderService(new ConsoleLogger());
-service.ProcessOrder();
 ```
+Program started.
+Expensive Resource Created.
+Resource in use.
+Resource in use.
+```
+
+## Benefits
+
+* Delays the creation of objects until they are actually needed.
+* Optimizes resource usage, improving application performance.
+* Provides thread-safe lazy initialization using `Lazy<T>` in C#.
+
+## Similar Patterns to Learn
+
+* Singleton Pattern (can use Lazy Initialization)
+* Factory Pattern
+* Object Pool Pattern
+
+## Common Mistakes
+
+* Using Lazy Initialization for objects that are always needed, leading to unnecessary complexity.
+* Forgetting to use `Lazy<T>` with thread safety (`LazyThreadSafetyMode` for advanced scenarios).
+* Misunderstanding that Lazy Initialization is not suitable for all scenarios (e.g., if initialization always occurs).
+
+## 10 Interview Questions with Answers
+
+1. **What is the Lazy Initialization Pattern in C#?**
+
+   * It is a creational pattern that delays the creation of an object until it is actually needed.
+
+2. **How does Lazy Initialization differ from Eager Initialization?**
+
+   * Lazy Initialization creates the object only when accessed, while Eager Initialization creates it immediately.
+
+3. **How is Lazy Initialization implemented in C#?**
+
+   * Using the `Lazy<T>` class in the .NET framework.
+
+4. **What are the benefits of using Lazy Initialization?**
+
+   * Reduced memory usage, improved performance, and deferred object creation.
+
+5. **Can Lazy Initialization be used in a multithreaded environment?**
+
+   * Yes, using `Lazy<T>` with thread-safe modes like `LazyThreadSafetyMode.ExecutionAndPublication`.
+
+6. **How do you forcefully initialize a lazy object?**
+
+   * By accessing the `Value` property of the `Lazy<T>` instance.
+
+7. **What are the thread safety modes available for Lazy Initialization in C#?**
+
+   * `LazyThreadSafetyMode.None`, `LazyThreadSafetyMode.PublicationOnly`, and `LazyThreadSafetyMode.ExecutionAndPublication`.
+
+8. **What is the difference between Lazy Initialization and Object Pool Pattern?**
+
+   * Lazy Initialization delays creation, while Object Pool reuses a set of pre-created objects.
+
+9. **When should you avoid using Lazy Initialization?**
+
+   * When the object is always needed or when delayed creation can cause performance issues.
+
+10. **How do you initialize a Lazy object with a custom factory method?**
+
+* By using `new Lazy<T>(() => new MyObject())`.
 
 ## 32. Service Locator Pattern
 
-* **Definition:** Provides a centralized point to obtain services, avoiding direct instantiation.
-* **When to Use:** Use when you have a large number of services that you want to manage centrally.
-* **Similar Patterns to Learn:** Dependency Injection, Factory.
+## Definition
+
+The Service Locator Pattern is a design pattern used to obtain the required services at runtime without directly instantiating them. It provides a centralized registry (locator) that returns the appropriate service object upon request.
+
+## When to Use
+
+* When you want a centralized way to manage service instances in an application.
+* When dependency injection is not feasible or becomes complex.
+* When you want to dynamically resolve services without hardcoding dependencies.
+
+## Key Components
+
+1. **Service Locator (Registry)**: A centralized class that manages the services.
+2. **Service Interface**: Defines the contract for the service.
+3. **Concrete Service**: Implements the service interface.
+4. **Client (Consumer)**: The code that uses the service without directly instantiating it.
+
+## Real-World Analogy
+
+Imagine a hotel concierge service. Guests can request various services (room service, taxi booking, spa) without directly contacting the providers. The concierge locates the appropriate service provider and arranges it for the guest.
+
+## Full Code Example
 
 ```csharp
-public class ServiceLocator
+using System;
+using System.Collections.Generic;
+
+// Service Interface
+public interface IMessageService
 {
-    private static readonly Dictionary<string, object> _services = new();
+    void SendMessage(string message);
+}
 
-    public static void RegisterService<T>(T service) => _services[typeof(T).Name] = service;
+// Concrete Service - Email
+public class EmailService : IMessageService
+{
+    public void SendMessage(string message)
+    {
+        Console.WriteLine($"Email sent: {message}");
+    }
+}
 
-    public static T GetService<T>() => (T)_services[typeof(T).Name];
+// Concrete Service - SMS
+public class SmsService : IMessageService
+{
+    public void SendMessage(string message)
+    {
+        Console.WriteLine($"SMS sent: {message}");
+    }
+}
+
+// Service Locator
+public static class ServiceLocator
+{
+    private static readonly Dictionary<string, IMessageService> _services = new Dictionary<string, IMessageService>();
+
+    // Register a service
+    public static void RegisterService(string key, IMessageService service)
+    {
+        if (!_services.ContainsKey(key))
+        {
+            _services.Add(key, service);
+        }
+    }
+
+    // Get a service
+    public static IMessageService GetService(string key)
+    {
+        if (_services.TryGetValue(key, out var service))
+        {
+            return service;
+        }
+
+        throw new InvalidOperationException("Service not found.");
+    }
 }
 
 // Usage
-ServiceLocator.RegisterService<ILogger>(new ConsoleLogger());
-var logger = ServiceLocator.GetService<ILogger>();
-logger.Log("Service Locator Pattern.");
+class Program
+{
+    static void Main()
+    {
+        // Register services
+        ServiceLocator.RegisterService("email", new EmailService());
+        ServiceLocator.RegisterService("sms", new SmsService());
+
+        // Use services
+        var emailService = ServiceLocator.GetService("email");
+        emailService.SendMessage("Hello via Email!");
+
+        var smsService = ServiceLocator.GetService("sms");
+        smsService.SendMessage("Hello via SMS!");
+    }
+}
 ```
+
+## Benefits
+
+* Provides a centralized way to manage service instances.
+* Allows dynamic resolution of services without hardcoding dependencies.
+* Reduces code duplication by centralizing service management.
+
+## Similar Patterns to Learn
+
+* Dependency Injection Pattern
+* Factory Pattern
+* Singleton Pattern
+
+## Common Mistakes
+
+* Overusing the Service Locator, leading to a lack of clarity on dependencies.
+* Making the Service Locator a global static class, causing testing difficulties.
+* Failing to handle missing services, leading to runtime exceptions.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Service Locator Pattern in C#?**
+
+   * It is a design pattern that provides a centralized registry for obtaining service instances at runtime.
+
+2. **How does Service Locator differ from Dependency Injection?**
+
+   * Service Locator pulls dependencies from a centralized registry, while Dependency Injection pushes dependencies into the consuming class.
+
+3. **What are the key components of the Service Locator Pattern?**
+
+   * Service Locator (Registry), Service Interface, Concrete Service, and Client.
+
+4. **Can you provide a real-world example of Service Locator Pattern?**
+
+   * A hotel concierge that provides access to various services (room service, taxi, spa) without directly contacting providers.
+
+5. **What are the main benefits of using Service Locator Pattern?**
+
+   * Centralized service management and dynamic service resolution.
+
+6. **Is Service Locator an anti-pattern? Why?**
+
+   * It can become an anti-pattern if overused, making code harder to test and understand.
+
+7. **How do you register services in a Service Locator?**
+
+   * By using a method like `RegisterService` that stores services in a dictionary.
+
+8. **What is the disadvantage of using a static Service Locator?**
+
+   * It introduces global state, making unit testing difficult.
+
+9. **How does Service Locator follow the Open/Closed Principle?**
+
+   * New services can be added without modifying existing code.
+
+10. **How do you prevent a Service Locator from becoming an anti-pattern?**
+
+* By limiting its use to non-critical services and avoiding it for core dependencies.
+
 
 ## 33. Fluent Interface Pattern
 
