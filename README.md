@@ -2564,176 +2564,835 @@ class Program
 
 ## 16. Mediator Pattern
 
-* **Definition:** Defines an object that encapsulates how a set of objects interact.
-* **When to Use:** Use when you want to centralize complex communication logic.
-* **Similar Patterns to Learn:** Observer, Facade.
+## Definition
+
+The Mediator Pattern is a behavioral design pattern that facilitates communication between multiple objects without them directly referencing each other. It promotes loose coupling by introducing a mediator object that controls communication between components.
+
+## When to Use
+
+* When you have a group of related objects that need to communicate, but you want to avoid direct connections between them.
+* When adding or modifying communication between objects should not require changes in those objects.
+* When you want to centralize complex interaction logic.
+
+## Key Components
+
+1. **Mediator Interface:** Defines the communication method.
+2. **Concrete Mediator:** Implements the communication logic between components.
+3. **Colleagues (Components):** The objects that communicate through the mediator.
+
+## Real-World Analogy
+
+Imagine an Air Traffic Control (ATC) system at an airport. Each airplane (Colleague) does not communicate directly with other airplanes. Instead, all communication is handled by the ATC (Mediator), which coordinates landings, takeoffs, and air traffic.
+
+## Full Code Example
 
 ```csharp
-public interface IMediator
+using System;
+using System.Collections.Generic;
+
+// Mediator Interface
+public interface IChatMediator
 {
-    void SendMessage(string message, User user);
+    void RegisterUser(User user);
+    void SendMessage(string message, User sender);
 }
 
-public class ChatMediator : IMediator
+// Concrete Mediator
+public class ChatMediator : IChatMediator
 {
     private readonly List<User> _users = new();
 
-    public void RegisterUser(User user) => _users.Add(user);
-
-    public void SendMessage(string message, User user)
+    public void RegisterUser(User user)
     {
-        foreach (var u in _users)
+        _users.Add(user);
+        user.SetMediator(this);
+    }
+
+    public void SendMessage(string message, User sender)
+    {
+        foreach (var user in _users)
         {
-            if (u != user) u.ReceiveMessage(message);
+            if (user != sender)
+            {
+                user.ReceiveMessage(message);
+            }
         }
     }
 }
 
-public class User
+// Colleague (User)
+public abstract class User
 {
-    private readonly IMediator _mediator;
+    protected IChatMediator _mediator;
     public string Name { get; }
 
-    public User(IMediator mediator, string name)
+    public User(string name)
     {
-        _mediator = mediator;
         Name = name;
     }
 
-    public void Send(string message) => _mediator.SendMessage(message, this);
-    public void ReceiveMessage(string message) => Console.WriteLine($"{Name} received: {message}");
-}
-```
-
-## 17. Memento Pattern
-
-* **Definition:** Captures and restores an object's internal state without violating encapsulation.
-* **When to Use:** Use when you need to save and restore object states.
-* **Similar Patterns to Learn:** Command, Prototype.
-
-```csharp
-public class Editor
-{
-    public string Content { get; set; }
-
-    public EditorState Save() => new EditorState(Content);
-    public void Restore(EditorState state) => Content = state.Content;
-}
-
-public class EditorState
-{
-    public string Content { get; }
-
-    public EditorState(string content) => Content = content;
-}
-
-public class History
-{
-    private readonly Stack<EditorState> _states = new();
-
-    public void Push(EditorState state) => _states.Push(state);
-    public EditorState Pop() => _states.Pop();
-}
-```
-
-## 18. Observer Pattern
-
-* **Definition:** Defines a one-to-many dependency between objects so that when one object changes state, all dependents are notified.
-* **When to Use:** Use when you need to notify multiple objects of state changes.
-* **Similar Patterns to Learn:** Mediator, Event.
-
-```csharp
-public interface IObserver
-{
-    void Update(string message);
-}
-
-public class ConcreteObserver : IObserver
-{
-    public string Name { get; }
-
-    public ConcreteObserver(string name) => Name = name;
-
-    public void Update(string message) => Console.WriteLine($"{Name} received: {message}");
-}
-
-public class Subject
-{
-    private readonly List<IObserver> _observers = new();
-
-    public void Attach(IObserver observer) => _observers.Add(observer);
-    public void Notify(string message)
+    public void SetMediator(IChatMediator mediator)
     {
-        foreach (var observer in _observers)
-            observer.Update(message);
+        _mediator = mediator;
+    }
+
+    public abstract void SendMessage(string message);
+    public abstract void ReceiveMessage(string message);
+}
+
+// Concrete Colleague
+public class ChatUser : User
+{
+    public ChatUser(string name) : base(name) { }
+
+    public override void SendMessage(string message)
+    {
+        Console.WriteLine($"{Name} sends: {message}");
+        _mediator.SendMessage(message, this);
+    }
+
+    public override void ReceiveMessage(string message)
+    {
+        Console.WriteLine($"{Name} receives: {message}");
+    }
+}
+
+// Usage Example
+class Program
+{
+    static void Main(string[] args)
+    {
+        IChatMediator chatMediator = new ChatMediator();
+
+        User user1 = new ChatUser("Alice");
+        User user2 = new ChatUser("Bob");
+        User user3 = new ChatUser("Charlie");
+
+        chatMediator.RegisterUser(user1);
+        chatMediator.RegisterUser(user2);
+        chatMediator.RegisterUser(user3);
+
+        user1.SendMessage("Hello, everyone!");
     }
 }
 ```
 
-## 19. State Pattern
+## Benefits
 
-* **Definition:** Allows an object to change its behavior when its internal state changes.
-* **When to Use:** Use when an object’s behavior depends on its state.
-* **Similar Patterns to Learn:** Strategy, Command.
+* Promotes loose coupling between objects.
+* Centralizes communication logic.
+* Makes it easier to add or modify communication between components.
+
+## Similar Patterns to Learn
+
+* Observer Pattern
+* Command Pattern
+* Facade Pattern
+
+## Common Mistakes
+
+* Making the Mediator too complex, becoming a "God Object."
+* Allowing Colleague components to bypass the mediator and directly communicate.
+* Not properly managing the lifecycle of components within the Mediator.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Mediator Pattern in C#?**
+
+   * The Mediator Pattern is a behavioral design pattern that centralizes communication between objects, promoting loose coupling.
+
+2. **When would you use a Mediator Pattern?**
+
+   * When you want to centralize communication between multiple objects without having them directly reference each other.
+
+3. **What are the key components of the Mediator Pattern?**
+
+   * Mediator Interface, Concrete Mediator, Colleague Components.
+
+4. **How does the Mediator Pattern promote loose coupling?**
+
+   * Objects communicate only through the Mediator, not directly with each other.
+
+5. **What is a real-world analogy of the Mediator Pattern?**
+
+   * An Air Traffic Control (ATC) system where planes communicate through ATC instead of directly with each other.
+
+6. **Can you name a scenario where the Mediator Pattern is a bad choice?**
+
+   * When the Mediator becomes overly complex, effectively becoming a "God Object."
+
+7. **What are the disadvantages of the Mediator Pattern?**
+
+   * The Mediator can become a bottleneck or too complex if not designed properly.
+
+8. **How does the Mediator differ from the Observer Pattern?**
+
+   * Mediator centralizes communication, while Observer defines a one-to-many dependency.
+
+9. **How can you avoid making the Mediator a "God Object"?**
+
+   * Keep communication logic simple, use multiple Mediators if needed.
+
+10. **What are some similar patterns to the Mediator Pattern?**
+
+* Observer, Command, Facade.
+
+
+## 17. Memento Design Pattern 
+
+## Definition
+
+The Memento Design Pattern is a behavioral design pattern that allows you to capture and save the state of an object without exposing its implementation details, and then restore that state later.
+
+## When to Use
+
+* When you need to save and restore the state of an object.
+* When direct access to the state is not allowed (encapsulation).
+* When implementing undo/redo functionality in an application.
+
+## Key Components
+
+1. **Originator**: The object whose state needs to be saved.
+2. **Memento**: A representation of the saved state (a snapshot).
+3. **Caretaker**: Manages the saving and restoring of mementos without modifying the memento's state.
+
+## Real-World Analogy
+
+Think of a video game save system. When you save your progress (Memento), you create a snapshot of your character's stats, inventory, and location (Originator). The game manages the save files (Caretaker), allowing you to restore them when needed.
+
+## Full Code Example
 
 ```csharp
-public interface IState
+using System;
+using System.Collections.Generic;
+
+// Originator
+class Document
 {
-    void Handle(Context context);
+    public string Content { get; set; }
+
+    public DocumentMemento Save() => new DocumentMemento(Content);
+
+    public void Restore(DocumentMemento memento)
+    {
+        Content = memento.Content;
+    }
 }
 
-public class HappyState : IState
+// Memento
+class DocumentMemento
 {
-    public void Handle(Context context) => Console.WriteLine("I am happy!");
+    public string Content { get; }
+
+    public DocumentMemento(string content)
+    {
+        Content = content;
+    }
 }
 
-public class SadState : IState
+// Caretaker
+class DocumentHistory
 {
-    public void Handle(Context context) => Console.WriteLine("I am sad.");
+    private Stack<DocumentMemento> _history = new Stack<DocumentMemento>();
+
+    public void Save(Document document)
+    {
+        _history.Push(document.Save());
+    }
+
+    public void Undo(Document document)
+    {
+        if (_history.Count > 0)
+        {
+            document.Restore(_history.Pop());
+        }
+        else
+        {
+            Console.WriteLine("No more undo available.");
+        }
+    }
 }
 
-public class Context
+// Usage
+class Program
 {
-    private IState _state;
+    static void Main()
+    {
+        Document doc = new Document();
+        DocumentHistory history = new DocumentHistory();
 
-    public void SetState(IState state) => _state = state;
-    public void Request() => _state?.Handle(this);
+        doc.Content = "Version 1";
+        history.Save(doc);
+
+        doc.Content = "Version 2";
+        history.Save(doc);
+
+        doc.Content = "Version 3";
+        Console.WriteLine("Current Content: " + doc.Content);
+
+        history.Undo(doc);
+        Console.WriteLine("After Undo: " + doc.Content);
+
+        history.Undo(doc);
+        Console.WriteLine("After Another Undo: " + doc.Content);
+    }
 }
 ```
+
+## Benefits
+
+* Provides an undo/redo mechanism.
+* Encapsulates state-saving logic within the Originator.
+* Prevents direct access to the state of the Originator.
+
+## Similar Patterns to Learn
+
+* Command Pattern (For executing and undoing commands).
+* Prototype Pattern (For cloning objects).
+* Snapshot Pattern (For state management).
+
+## Common Mistakes
+
+* Exposing the state of the Memento, violating encapsulation.
+* Making the Memento mutable.
+* Not properly managing the history in the Caretaker.
+
+## 10 Interview Questions with Detailed Answers
+
+1. **What is the Memento Design Pattern?**
+
+   * Answer: It is a behavioral design pattern that captures and saves an object's state without exposing its implementation details.
+
+2. **What are the three main components of the Memento Pattern?**
+
+   * Answer: Originator, Memento, and Caretaker.
+
+3. **How does the Memento Pattern ensure encapsulation?**
+
+   * Answer: By making the Memento a separate class that only the Originator can directly access.
+
+4. **When should you use the Memento Pattern?**
+
+   * Answer: When you need to save and restore the state of an object, such as implementing an undo/redo feature.
+
+5. **What is the role of the Caretaker?**
+
+   * Answer: It manages the saved mementos and decides when to save or restore them without modifying their state.
+
+6. **What is the difference between Memento and Prototype Pattern?**
+
+   * Answer: Memento saves an object's state for restoration, while Prototype creates a copy of an object.
+
+7. **Can Memento be used with multiple state variables?**
+
+   * Answer: Yes, the Memento can store multiple state variables, but it should maintain encapsulation.
+
+8. **How does the Caretaker ensure the correct state is restored?**
+
+   * Answer: It stores and manages a history of mementos, allowing step-by-step restoration.
+
+9. **What are the common mistakes with the Memento Pattern?**
+
+   * Answer: Exposing the state of the Memento and making it mutable.
+
+10. **Can Memento Pattern be used for complex objects?**
+
+* Answer: Yes, but it should be carefully designed to avoid excessive memory usage.
+
+
+## 18. Observer Pattern
+
+## Definition
+
+The Observer Pattern is a behavioral design pattern that defines a one-to-many dependency between objects. When one object (the subject) changes its state, all its dependent objects (observers) are notified and updated automatically.
+
+## When to Use
+
+* When an object should automatically notify multiple dependent objects about any state changes.
+* When you have a publisher/subscriber scenario, where subscribers depend on the state of the publisher.
+* Ideal for implementing event handling systems or real-time notifications.
+
+## Key Components
+
+1. **Subject (Publisher)**: The object that holds the state and notifies observers.
+2. **Observer (Subscriber)**: Objects that receive notifications from the subject.
+3. **ConcreteSubject**: A specific implementation of the subject that stores the state.
+4. **ConcreteObserver**: A specific implementation of the observer that receives updates.
+
+## Real-World Analogy
+
+Imagine a news agency (Subject) that publishes news updates. Subscribers (Observers) can register to receive notifications. When news is published, all registered subscribers automatically receive the update.
+
+## Full Code Example
+
+```csharp
+using System;
+using System.Collections.Generic;
+
+// Subject Interface
+public interface ISubject {
+    void Attach(IObserver observer);
+    void Detach(IObserver observer);
+    void Notify();
+}
+
+// Concrete Subject
+public class NewsAgency : ISubject {
+    private List<IObserver> _observers = new List<IObserver>();
+    private string _news;
+
+    public string News {
+        get => _news;
+        set {
+            _news = value;
+            Notify();
+        }
+    }
+
+    public void Attach(IObserver observer) => _observers.Add(observer);
+    public void Detach(IObserver observer) => _observers.Remove(observer);
+
+    public void Notify() {
+        foreach (var observer in _observers) {
+            observer.Update(_news);
+        }
+    }
+}
+
+// Observer Interface
+public interface IObserver {
+    void Update(string news);
+}
+
+// Concrete Observer
+public class Subscriber : IObserver {
+    private string _name;
+
+    public Subscriber(string name) => _name = name;
+
+    public void Update(string news) {
+        Console.WriteLine($"{_name} received news update: {news}");
+    }
+}
+
+// Usage
+class Program {
+    static void Main() {
+        var agency = new NewsAgency();
+
+        var sub1 = new Subscriber("Alice");
+        var sub2 = new Subscriber("Bob");
+
+        agency.Attach(sub1);
+        agency.Attach(sub2);
+
+        agency.News = "Breaking News: New technology released!";
+
+        agency.Detach(sub1);
+
+        agency.News = "Update: Technology is trending now.";
+    }
+}
+```
+
+## Benefits
+
+* Decouples subjects from observers, making the system flexible and scalable.
+* Provides a push-based notification mechanism.
+* Easy to add/remove observers without affecting the subject.
+
+## Similar Patterns to Learn
+
+* Mediator Pattern
+* Event Aggregator Pattern
+* Publisher-Subscriber Pattern
+
+## Common Mistakes
+
+* Overusing the pattern for simple scenarios where direct method calls are more efficient.
+* Failing to manage observer lifecycle, leading to memory leaks.
+* Not considering thread safety in multi-threaded scenarios.
+
+## 10 Interview Questions with Detailed Answers
+
+1. **What is the Observer Pattern?**
+
+* The Observer Pattern is a behavioral design pattern where an object (subject) notifies a list of dependent objects (observers) of any state changes.
+
+2. **When should you use the Observer Pattern?**
+
+* When you have a one-to-many dependency, such as event handling or notification systems.
+
+3. **What are the key components of the Observer Pattern?**
+
+* Subject, Observer, ConcreteSubject, and ConcreteObserver.
+
+4. **How does the Observer Pattern differ from the Mediator Pattern?**
+
+* Observer has a direct dependency between the subject and observers, while Mediator handles communication through a central mediator.
+
+5. **How do you avoid memory leaks in Observer Pattern?**
+
+* Use weak references or ensure that observers are properly detached when no longer needed.
+
+6. **Can the Observer Pattern be implemented using Events in C#?**
+
+* Yes, the .NET EventHandler is a built-in implementation of the Observer Pattern.
+
+7. **How does the Observer Pattern support decoupling?**
+
+* Observers are unaware of the subject’s internal state and only rely on updates through an interface.
+
+8. **What is the difference between push and pull in Observer Pattern?**
+
+* Push: Subject sends state data directly to observers. Pull: Observers request state from the subject.
+
+9. **How can you make the Observer Pattern thread-safe?**
+
+* Use thread-safe collections for observer storage and implement locking during notifications.
+
+10. **What are some real-world use cases of the Observer Pattern?**
+
+* Event systems, logging frameworks, data binding in UI frameworks (like WPF, Blazor), and notification systems.
+
+
+## 19. State Pattern
+
+## Definition
+
+The State Pattern is a behavioral design pattern that allows an object to change its behavior when its internal state changes. It encapsulates state-specific behavior in separate classes and delegates state management to these classes.
+
+## When to Use
+
+* When an object’s behavior is dependent on its state and needs to change dynamically at runtime.
+* When you have complex conditional state transitions (if/else or switch statements) scattered across multiple methods.
+* When you want to make state transitions explicit and easily maintainable.
+
+## Key Components
+
+1. **Context**: The main object whose behavior changes depending on its state.
+2. **State (Interface or Abstract Class)**: Defines the interface for behavior associated with each state.
+3. **Concrete State Classes**: Implement behavior for each state.
+
+## Real-World Analogy
+
+Think of a vending machine. A vending machine has different states: Ready, Out of Stock, Processing Payment, and Dispensing Product. Depending on the current state, the machine behaves differently when a user interacts with it.
+
+## Full Code Example
+
+```csharp
+// State Interface
+public interface IState
+{
+    void InsertCoin();
+    void DispenseProduct();
+}
+
+// Concrete States
+public class ReadyState : IState
+{
+    private VendingMachine _vendingMachine;
+
+    public ReadyState(VendingMachine vendingMachine)
+    {
+        _vendingMachine = vendingMachine;
+    }
+
+    public void InsertCoin()
+    {
+        Console.WriteLine("Coin Inserted. Switching to Processing State.");
+        _vendingMachine.SetState(_vendingMachine.ProcessingState);
+    }
+
+    public void DispenseProduct()
+    {
+        Console.WriteLine("Cannot dispense. Please insert coin first.");
+    }
+}
+
+public class ProcessingState : IState
+{
+    private VendingMachine _vendingMachine;
+
+    public ProcessingState(VendingMachine vendingMachine)
+    {
+        _vendingMachine = vendingMachine;
+    }
+
+    public void InsertCoin()
+    {
+        Console.WriteLine("Already processing. Please wait.");
+    }
+
+    public void DispenseProduct()
+    {
+        Console.WriteLine("Dispensing product.");
+        _vendingMachine.SetState(_vendingMachine.ReadyState);
+    }
+}
+
+// Context
+public class VendingMachine
+{
+    public IState ReadyState { get; }
+    public IState ProcessingState { get; }
+
+    private IState _currentState;
+
+    public VendingMachine()
+    {
+        ReadyState = new ReadyState(this);
+        ProcessingState = new ProcessingState(this);
+        _currentState = ReadyState;
+    }
+
+    public void SetState(IState state)
+    {
+        _currentState = state;
+    }
+
+    public void InsertCoin()
+    {
+        _currentState.InsertCoin();
+    }
+
+    public void DispenseProduct()
+    {
+        _currentState.DispenseProduct();
+    }
+}
+
+// Usage
+class Program
+{
+    static void Main(string[] args)
+    {
+        VendingMachine vendingMachine = new VendingMachine();
+
+        vendingMachine.InsertCoin();
+        vendingMachine.DispenseProduct();
+
+        vendingMachine.InsertCoin();
+        vendingMachine.InsertCoin();
+    }
+}
+```
+
+## Benefits
+
+* Simplifies complex conditional state transitions.
+* Makes the code more maintainable and readable.
+* Each state behavior is isolated in its own class, following Single Responsibility Principle.
+
+## Similar Patterns to Learn
+
+* Strategy Pattern: Focuses on interchangeable algorithms.
+* Command Pattern: Encapsulates a request as an object.
+* Template Method Pattern: Defines the skeleton of an algorithm in a base class.
+
+## Common Mistakes
+
+* Overcomplicating the design by creating too many state classes for simple problems.
+* Not making state transitions explicit.
+* Using if/else conditions within the state classes, which defeats the purpose of the pattern.
+
+## 10 Interview Questions with Detailed Answers
+
+1. **What is the State Pattern, and how does it differ from Strategy Pattern?**
+
+   * The State Pattern focuses on changing behavior based on the object's internal state, while the Strategy Pattern focuses on interchangeable algorithms without changing the object's state.
+
+2. **When should you prefer using the State Pattern over a simple switch statement?**
+
+   * When your object has multiple complex state-dependent behaviors that would make a switch statement difficult to maintain.
+
+3. **Explain how the State Pattern adheres to the Open/Closed Principle.**
+
+   * The State Pattern allows adding new states without modifying existing code, making it open for extension but closed for modification.
+
+4. **How can the State Pattern help avoid duplicate code?**
+
+   * By isolating state-specific behavior in separate classes, it prevents duplicate condition checks scattered across the context.
+
+5. **What is the role of the Context class in the State Pattern?**
+
+   * It maintains a reference to the current state and delegates state-specific behavior to it.
+
+6. **Can the State Pattern work without an interface for states? Why or why not?**
+
+   * While it can work without an interface, using an interface ensures a common structure for all state classes.
+
+7. **How do you handle transitions between states in the State Pattern?**
+
+   * The context class is responsible for changing the current state.
+
+8. **What are the benefits of isolating state logic in separate classes?**
+
+   * It enhances code readability, maintainability, and adheres to the Single Responsibility Principle.
+
+9. **How would you refactor a class with multiple conditional statements using the State Pattern?**
+
+   * Extract state-specific behaviors into separate state classes and use a context class to manage them.
+
+10. **What is the impact of the State Pattern on unit testing?**
+
+* State-specific behavior can be tested independently, making testing easier and more focused.
+
 
 ## 20. Strategy Pattern
 
-* **Definition:** Defines a family of algorithms, encapsulates each one, and makes them interchangeable.
-* **When to Use:** Use when you need to switch between multiple algorithms at runtime.
-* **Similar Patterns to Learn:** State, Template Method.
+## Definition
+
+The Strategy Pattern is a behavioral design pattern that defines a family of algorithms, encapsulates each one, and makes them interchangeable. This pattern allows the algorithm to be selected at runtime.
+
+## When to Use
+
+* When you want to define multiple algorithms for a specific task but need to switch between them dynamically.
+* When your application needs to choose between different behaviors without modifying the client code.
+* When you want to separate the algorithm’s implementation from the client code.
+
+## Key Components
+
+1. **Strategy Interface**: Defines the algorithm or operation that can be performed.
+2. **Concrete Strategies**: Implement the strategy interface with different algorithms.
+3. **Context**: Holds a reference to a strategy object and allows switching strategies dynamically.
+
+## Real-World Analogy
+
+Imagine a payment system for an online store. Depending on the customer's choice, they can pay using Credit Card, PayPal, or Bitcoin. Each of these payment methods can be considered a separate strategy, but they share a common interface for processing payments.
+
+## Full Code Example
 
 ```csharp
-public interface IStrategy
+// Strategy Interface
+public interface IPaymentStrategy
 {
-    int Execute(int a, int b);
+    void Pay(decimal amount);
 }
 
-public class AdditionStrategy : IStrategy
+// Concrete Strategies
+public class CreditCardPayment : IPaymentStrategy
 {
-    public int Execute(int a, int b) => a + b;
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($"Paid {amount} using Credit Card.");
+    }
 }
 
-public class SubtractionStrategy : IStrategy
+public class PayPalPayment : IPaymentStrategy
 {
-    public int Execute(int a, int b) => a - b;
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($"Paid {amount} using PayPal.");
+    }
 }
 
-public class Calculator
+public class BitcoinPayment : IPaymentStrategy
 {
-    private IStrategy _strategy;
+    public void Pay(decimal amount)
+    {
+        Console.WriteLine($"Paid {amount} using Bitcoin.");
+    }
+}
 
-    public void SetStrategy(IStrategy strategy) => _strategy = strategy;
+// Context
+public class PaymentContext
+{
+    private IPaymentStrategy _paymentStrategy;
 
-    public int Calculate(int a, int b) => _strategy.Execute(a, b);
+    public void SetPaymentStrategy(IPaymentStrategy paymentStrategy)
+    {
+        _paymentStrategy = paymentStrategy;
+    }
+
+    public void ProcessPayment(decimal amount)
+    {
+        if (_paymentStrategy == null)
+            throw new InvalidOperationException("Payment strategy not set.");
+
+        _paymentStrategy.Pay(amount);
+    }
+}
+
+// Usage
+class Program
+{
+    static void Main()
+    {
+        PaymentContext context = new PaymentContext();
+
+        context.SetPaymentStrategy(new CreditCardPayment());
+        context.ProcessPayment(100);
+
+        context.SetPaymentStrategy(new PayPalPayment());
+        context.ProcessPayment(200);
+
+        context.SetPaymentStrategy(new BitcoinPayment());
+        context.ProcessPayment(300);
+    }
 }
 ```
 
-# Design Patterns 21-25: Full Details with Code
+## Benefits
+
+* Allows switching between algorithms at runtime.
+* Follows the Open/Closed Principle (new strategies can be added without modifying existing code).
+* Decouples the algorithm from the context, making it more flexible.
+
+## Similar Patterns to Learn
+
+* State Pattern
+* Template Method Pattern
+* Command Pattern
+
+## Common Mistakes
+
+* Not making the strategy interface flexible enough, leading to code duplication.
+* Using strategy pattern even when a single algorithm is sufficient.
+* Tight coupling between context and concrete strategies.
+
+## 10 Interview Questions with Answers
+
+1. **What is the Strategy Pattern in C#?**
+
+   * It is a behavioral design pattern that allows switching between different algorithms or strategies at runtime.
+
+2. **How does the Strategy Pattern differ from the State Pattern?**
+
+   * Strategy focuses on interchangeable algorithms, while State deals with object behavior changes based on its state.
+
+3. **Can you provide a real-world example of the Strategy Pattern?**
+
+   * A payment system where users can choose between Credit Card, PayPal, or Bitcoin.
+
+4. **What are the key components of the Strategy Pattern?**
+
+   * Strategy Interface, Concrete Strategies, and Context.
+
+5. **How do you ensure the Strategy Pattern is flexible?**
+
+   * By defining a general strategy interface and allowing multiple implementations.
+
+6. **How does Strategy Pattern support the Open/Closed Principle?**
+
+   * New strategies can be added without modifying the context or existing strategies.
+
+7. **Is it necessary to use interfaces for the Strategy Pattern?**
+
+   * It is best practice, but abstract classes can also be used.
+
+8. **Can you implement Strategy Pattern without a Context class?**
+
+   * Yes, but the context centralizes the strategy selection, making it more organized.
+
+9. **What are the common mistakes in using Strategy Pattern?**
+
+   * Not making the strategy interface flexible, creating tight coupling.
+
+10. **How do you switch between strategies at runtime?**
+
+* By setting a different strategy in the context using a method like `SetPaymentStrategy()`.
+
 
 ## 21. Template Method Pattern
 
